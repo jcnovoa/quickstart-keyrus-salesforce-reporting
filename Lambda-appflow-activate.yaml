@@ -1,69 +1,69 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation Template for AppFlow'
-Resource:
-  LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-              - appflow.amazonaws.com
-              - lambda.amazonaws.com
-              - redshift.amazonaws.com
-          Action:
-          - sts:AssumeRole
+# AWSTemplateFormatVersion: '2010-09-09'
+# Description: 'CloudFormation Template for AppFlow'
+# Resource:
+#   LambdaExecutionRole:
+#     Type: AWS::IAM::Role
+#     Properties:
+#       AssumeRolePolicyDocument:
+#         Version: '2012-10-17'
+#         Statement:
+#         - Effect: Allow
+#           Principal:
+#             Service:
+#               - appflow.amazonaws.com
+#               - lambda.amazonaws.com
+#               - redshift.amazonaws.com
+#           Action:
+#           - sts:AssumeRole
           
-      Path: "/"
-      Policies:
-      - PolicyName: root
-        PolicyDocument:
-          Version: '2012-10-17'
-          Statement:
-          - Effect: Allow
-            Action:
-            - logs:*
-            Resource: arn:aws:logs:*:*:*
-  Primerinvoke:
-    Type: AWS::CloudFormation::CustomResource
-    # DependsOn: SaleforceFlow
-    DependsOn: ActivateAppFlowOnStart
-    Version: "1.0"
-    Properties:
-      ServiceToken: !GetAtt ActivateAppFlowOnStart.Arn
-  ActivateAppFlowOnStart:
-    Type: AWS::Lambda::Function
-    # DependsOn: SaleforceFlow
-    DependsOn: LambdaExecutionRole
-    Properties:
-      Handler: index.handler
-      Role: !GetAtt LambdaExecutionRole.Arn
-      Runtime: python3.7
-      Timeout: 180
-      Code:    
-        ZipFile: !Sub |
-          import json
-          import time
-          import boto3
-          import cfnresponse
+#       Path: "/"
+#       Policies:
+#       - PolicyName: root
+#         PolicyDocument:
+#           Version: '2012-10-17'
+#           Statement:
+#           - Effect: Allow
+#             Action:
+#             - logs:*
+#             Resource: arn:aws:logs:*:*:*
+#   Primerinvoke:
+#     Type: AWS::CloudFormation::CustomResource
+#     # DependsOn: SaleforceFlow
+#     DependsOn: ActivateAppFlowOnStart
+#     Version: "1.0"
+#     Properties:
+#       ServiceToken: !GetAtt ActivateAppFlowOnStart.Arn
+#   ActivateAppFlowOnStart:
+#     Type: AWS::Lambda::Function
+#     # DependsOn: SaleforceFlow
+#     DependsOn: LambdaExecutionRole
+#     Properties:
+#       Handler: index.handler
+#       Role: !GetAtt LambdaExecutionRole.Arn
+#       Runtime: python3.7
+#       Timeout: 180
+#       Code:    
+#         ZipFile: !Sub |
+#           import json
+#           import time
+#           import boto3
+#           import cfnresponse
           
-          def describe_connector(event, context):
-           response = client.describe_connectors( connectorTypes=[])
-           return {'response': response['connectorConfigurations']}
-          def handler(event, context):
-            try:
-              client = boto3.client('appflow')
-              response = client.start_flow (
-                flowName="${flowname}"
-              )
-              responseData = {}
-              responseValue = 120
-              responseData['Data'] = responseValue
-              cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
-              responseBody = {'statusCode': 200 , 'Status': 'SUCCESS' }
-              responseBody = json.dumps(responseBody)
-              return responseBody
-            except Exception as e:
-              print(e)
+#           def describe_connector(event, context):
+#            response = client.describe_connectors( connectorTypes=[])
+#            return {'response': response['connectorConfigurations']}
+#           def handler(event, context):
+#             try:
+#               client = boto3.client('appflow')
+#               response = client.start_flow (
+#                 flowName="${flowname}"
+#               )
+#               responseData = {}
+#               responseValue = 120
+#               responseData['Data'] = responseValue
+#               cfnresponse.send(event, context, cfnresponse.SUCCESS, responseData)
+#               responseBody = {'statusCode': 200 , 'Status': 'SUCCESS' }
+#               responseBody = json.dumps(responseBody)
+#               return responseBody
+#             except Exception as e:
+#               print(e)
