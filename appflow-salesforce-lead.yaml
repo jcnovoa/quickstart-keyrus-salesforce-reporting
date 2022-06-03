@@ -4,11 +4,11 @@ Parameters:
   flowname:
     Description: "Name of the flow"
     Type: String
-    Default: Lead-Saleforce
+    Default: Lead-Salesforce
 
   connectorSaleforce: 
     Type: String
-    Description: "Saleforce Connector name "
+    Description: "Salesforce Connector name "
     Default: aws_demo
 
 Resources:

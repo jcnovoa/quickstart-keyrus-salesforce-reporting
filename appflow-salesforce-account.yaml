@@ -5,10 +5,10 @@ Parameters:
   flowname:
     Description: "Name of the AppFlow"
     Type: String
-    Default: Account-Saleforce
+    Default: Account-Salesforce
   connectorSaleforce: 
     Type: String
-    Description: "Saleforce Connector name "
+    Description: "Salesforce Connector name "
     Default: aws_demo
   
   
