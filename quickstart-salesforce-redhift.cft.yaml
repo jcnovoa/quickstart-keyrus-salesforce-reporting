@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Redshift Stack
+Description: Salesforce Redshift Stack with network setup
 Parameters:
 
   ## Database Settings ##
@@ -10,18 +10,18 @@ Parameters:
   MasterUsername:
     Type: String
     Description: Master user name for Redshift
-    Default: keyrus
+    Default: vitalii
   MasterUserPassword:
-    Default: Keyrus-US-2022
+    Default: 9YGGbgU7Ltd
     Description: Master password for Redshift (used mixed case and numbers) Make Sure this is solid something with special chars.
     Type: String
-    NoEcho: 'true'
-    MinLength: '8'
-    MaxLength: '64'
-    AllowedPattern: >-
-     ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?!._*[@/\\\"']).*$
-    ConstraintDescription: >-
-     Enter alphanumeric password for the master user. The password must contain 8 to 64 printable ASCII characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter, one lowercase letter, and one number.
+    # NoEcho: 'true'
+    # MinLength: '8'
+    # MaxLength: '64'
+    # AllowedPattern: >-
+    #  ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?!._*[@/\\\"']).*$
+    # ConstraintDescription: >-
+    #  Enter alphanumeric password for the master user. The password must contain 8 to 64 printable ASCII characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter, one lowercase letter, and one number.
     
   ## End Database Settings ## 
   
@@ -68,6 +68,7 @@ Parameters:
   S3BucketName:
     Type: String
     Description: S3 data bucket name
+    Default: 'aws-appflow-s3-bucket'
 
   S3BucketPrefix:
     Description: The Prefix name for the S3 Bucket 
@@ -91,7 +92,7 @@ Parameters:
     Description: Connection Mode for Connection Profile
 
   ConnectorProfileName:
-    Default: 'Keyrus'
+    Default: 'Hello'
     Type: String
     Description: Connection Profile Name
 

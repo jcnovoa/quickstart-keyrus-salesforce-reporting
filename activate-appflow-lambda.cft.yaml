@@ -1,41 +1,36 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation Template for AppFlow'
-Resource:
+Description: 'CloudFormation Template for LambdaFunction for activate a AppflowLogs'
+Parameters:
+  AppFlowName:
+    Description: "Name of the flow to activate"
+    Type: String
+    Default: salesforce-appflow
+Resources:
   LambdaExecutionRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Effect: Allow
-          Principal:
-            Service:
-              - appflow.amazonaws.com
-              - lambda.amazonaws.com
-              - redshift.amazonaws.com
-          Action:
-          - sts:AssumeRole
-          
-      Path: "/"
-      Policies:
-      - PolicyName: root
-        PolicyDocument:
+      Type: AWS::IAM::Role
+      Properties:
+        AssumeRolePolicyDocument:
           Version: '2012-10-17'
           Statement:
           - Effect: Allow
+            Principal:
+              Service:
+              - appflow.amazonaws.com
+              - lambda.amazonaws.com
+              - redshift.amazonaws.com
             Action:
-            - logs:*
-            Resource: arn:aws:logs:*:*:*
-  Primerinvoke:
-    Type: AWS::CloudFormation::CustomResource
-    # DependsOn: SaleforceFlow
-    DependsOn: ActivateAppFlowOnStart
-    Version: "1.0"
-    Properties:
-      ServiceToken: !GetAtt ActivateAppFlowOnStart.Arn
+            - sts:AssumeRole  
+        Path: "/"
+        ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy
+        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
+        - arn:aws:iam::aws:policy/AmazonAppFlowFullAccess
+        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+
   ActivateAppFlowOnStart:
     Type: AWS::Lambda::Function
-    # DependsOn: SaleforceFlow
     DependsOn: LambdaExecutionRole
     Properties:
       Handler: index.handler
@@ -48,15 +43,17 @@ Resource:
           import time
           import boto3
           import cfnresponse
+
           
           def describe_connector(event, context):
            response = client.describe_connectors( connectorTypes=[])
            return {'response': response['connectorConfigurations']}
+
           def handler(event, context):
             try:
               client = boto3.client('appflow')
               response = client.start_flow (
-                flowName="${flowname}"
+                flowName="${AppFlowName}"
               )
               responseData = {}
               responseValue = 120
@@ -67,3 +64,13 @@ Resource:
               return responseBody
             except Exception as e:
               print(e)
+
+  Primerinvoke:
+    Type: AWS::CloudFormation::CustomResource
+    DependsOn: ActivateAppFlowOnStart
+    Version: "1.0"
+    Properties:
+      ServiceToken: !GetAtt ActivateAppFlowOnStart.Arn
+
+
+

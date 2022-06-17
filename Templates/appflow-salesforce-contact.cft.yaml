@@ -1,14 +1,21 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation Template for AppFlow'
 Parameters:
-  flowname:
+  AppFlowName:
     Description: "Name of the flow"
     Type: String
     Default: Contact-Salesforce
-  connectorSaleforce: 
+  ConnectorProfileName: 
     Type: String
     Description: "Salesforce Connector name "
     Default: aws_demo
+  ChildStackPath:
+    Description: "Path to child stack cft"
+    Type: String
+    Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
+  S3BucketName:
+    Type: String
+    Description: S3 data bucket name
 Resources:
   SaleforceFlow:
     Type: AWS::AppFlow::Flow
@@ -28,16 +35,17 @@ Resources:
               IntermediateBucketName: !ImportValue S3BucketName
               Object: ods.contact
 
-      FlowName: !Ref flowname
+      FlowName: !Ref AppFlowName
       # kmsARN:
       SourceFlowConfig:
-        ConnectorProfileName: !Ref connectorSaleforce
+        ConnectorProfileName: !Ref ConnectorProfileName
         ConnectorType: Salesforce
         SourceConnectorProperties: 
           Salesforce:
             EnableDynamicFieldUpdate: false
             IncludeDeletedRecords: false
             Object: Contact
+
       Tasks:
         - TaskType: Filter
           SourceFields:
@@ -802,4 +810,12 @@ Resources:
         TriggerType: Scheduled
         TriggerProperties:
           DataPullMode: Incremental
-          ScheduleExpression: rate(1minutes)
+          ScheduleExpression: rate(59minutes)
+          
+  ActivateAppflowLambda:
+    DependsOn: SaleforceFlow
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/activate-appflow-lambda.cft.yaml
+      Parameters:
+        AppFlowName: !Ref AppFlowName

@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'Root CloudFormation Template'
+Parameters:
+  ChildStackPath:
+    Description: "Path to child stack cfts"
+    Type: String
+    Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
+  ConnectorProfileName:
+    Description: "Name of the salesforce connector profile"
+    Type: String
+    Default: aws_demo
+  S3BucketName:
+    Type: String
+    Description: S3 data bucket name
+    # Default: 'aws-appflow-s3-bucket'
+
+Resources:
+  SaleforceRedshift:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/quickstart-salesforce-redhift.cft.yaml
+      Parameters:
+        S3BucketName: !Ref S3BucketName
+  
+  AppflowAccount:
+    DependsOn: SaleforceRedshift
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/Templates/appflow-salesforce-account.cft.yaml
+      Parameters:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ChildStackPath: !Ref ChildStackPath
+        S3BucketName: !Ref S3BucketName
+  AppflowCase:
+    DependsOn: SaleforceRedshift
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/Templates/appflow-salesforce-case.cft.yaml
+      Parameters:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ChildStackPath: !Ref ChildStackPath
+        S3BucketName: !Ref S3BucketName
+  AppflowContact:
+    DependsOn: SaleforceRedshift
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/Templates/appflow-salesforce-contact.cft.yaml
+      Parameters:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ChildStackPath: !Ref ChildStackPath
+        S3BucketName: !Ref S3BucketName
+  AppflowLead:
+    DependsOn: SaleforceRedshift
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/Templates/appflow-salesforce-lead.cft.yaml
+      Parameters:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ChildStackPath: !Ref ChildStackPath
+        S3BucketName: !Ref S3BucketName
+  AppflowOpportunity:
+    DependsOn: SaleforceRedshift
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub ${ChildStackPath}/Templates/appflow-salesforce-opportunity.cft.yaml
+      Parameters:
+        ConnectorProfileName: !Ref ConnectorProfileName
+        ChildStackPath: !Ref ChildStackPath
+        S3BucketName: !Ref S3BucketName
+
