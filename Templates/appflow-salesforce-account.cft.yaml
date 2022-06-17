@@ -11,14 +11,16 @@ Parameters:
   ConnectorProfileName:
     Description: "Name of the salesforce connector profile"
     Type: String
-    Default: aws_demo
+    # Default: aws_demo
   
   ChildStackPath:
     Description: "Path to child stack cft"
     Type: String
     Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
 
-
+  S3BucketName:
+    Type: String
+    Description: S3 data bucket name
 
 Resources:
   SaleforceFlow:

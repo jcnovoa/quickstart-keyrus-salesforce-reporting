@@ -8,7 +8,7 @@ Parameters:
   ConnectorProfileName: 
     Type: String
     Description: "Salesforce Connector name "
-    Default: aws_demo
+    # Default: aws_demo
   ChildStackPath:
     Description: "Path to child stack cft"
     Type: String
