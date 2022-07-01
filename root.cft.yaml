@@ -6,13 +6,42 @@ Parameters:
     Type: String
     Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
   ConnectorProfileName:
-    Description: "Name of the salesforce connector profile"
+    Description: "Select the Production radio box from the Salesforce environment section. Enter the connection name and click Continue. The Connection name must match in every single Cloudformation template for AppFlow logs or any other desired name."
     Type: String
     Default: aws_demo
+
   S3BucketName:
     Type: String
-    Description: S3 data bucket name
+    Description:  "S3 bucket where Amazon AppFlow will write data"
     # Default: 'aws-appflow-s3-bucket'
+  MasterUsername:
+    Type: String
+    Description: Master user name for Redshift
+  
+  MasterUserPassword:
+    Description: Master password for Redshift (used mixed case and numbers) Make Sure this is solid something with special charachters.
+    Type: String
+    # NoEcho: 'true'
+    # MinLength: '8'
+    # MaxLength: '64'
+    # AllowedPattern: >-
+    #  ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?!._*[@/\\\"']).*$
+    # ConstraintDescription: >-
+    #  Enter alphanumeric password for the master user. The password must contain 8 to 64 printable ASCII characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter, one lowercase letter, and one number.
+  NumberOfNodes:
+    Description: >-
+      The number of compute nodes in the cluster. For multi-node clusters, the NumberOfNodes parameter must be greater than 1.
+    Type: Number
+    Default: '1'
+  NodeType:
+    Description: The type of node to be provisioned
+    Type: String
+    Default: dc2.large 
+    AllowedValues:
+      - dc2.large
+      - dc2.8xlarge
+      - ds2.xlarge
+      - ds2.8xlarge
 
 Resources:
   SaleforceRedshift:
@@ -21,6 +50,11 @@ Resources:
       TemplateURL: !Sub ${ChildStackPath}/quickstart-salesforce-redhift.cft.yaml
       Parameters:
         S3BucketName: !Ref S3BucketName
+        MasterUsername: !Ref MasterUsername
+        MasterUserPassword: !Ref MasterUserPassword
+        NumberOfNodes: !Ref NumberOfNodes
+        NodeType: !Ref NodeType
+        
   
   AppflowAccount:
     DependsOn: SaleforceRedshift
@@ -31,6 +65,7 @@ Resources:
         ConnectorProfileName: !Ref ConnectorProfileName
         ChildStackPath: !Ref ChildStackPath
         S3BucketName: !Ref S3BucketName
+        
   AppflowCase:
     DependsOn: SaleforceRedshift
     Type: AWS::CloudFormation::Stack

@@ -10,9 +10,9 @@ Parameters:
   MasterUsername:
     Type: String
     Description: Master user name for Redshift
-    Default: vitalii
+    # Default: vitalii
   MasterUserPassword:
-    Default: 9YGGbgU7Ltd
+    # Default: 9YGGbgU7Ltd
     Description: Master password for Redshift (used mixed case and numbers) Make Sure this is solid something with special chars.
     Type: String
     # NoEcho: 'true'
@@ -592,7 +592,7 @@ Resources:
   RedshiftIAMRole:
     Type: 'AWS::IAM::Role'
     Properties:
-      RoleName: !Join [ "-", [!Ref 'AWS::StackName', "RedshiftSpectrumRole"] ]
+      RoleName: !Join [ "-", [!Ref 'AWS::StackName', "RedshiftIamRole"] ]
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
