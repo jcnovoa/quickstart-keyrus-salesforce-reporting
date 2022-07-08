@@ -92,6 +92,8 @@ Resources:
         ConnectorProfileName: !Ref ConnectorProfileName
         ChildStackPath: !Ref ChildStackPath
         S3BucketName: !Ref S3BucketName
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
   AppflowCase:
     DependsOn: SaleforceRedshift
     Type: AWS::CloudFormation::Stack
@@ -116,6 +118,8 @@ Resources:
         ConnectorProfileName: !Ref ConnectorProfileName
         ChildStackPath: !Ref ChildStackPath
         S3BucketName: !Ref S3BucketName
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
   AppflowLead:
     DependsOn: SaleforceRedshift
     Type: AWS::CloudFormation::Stack
@@ -140,4 +144,6 @@ Resources:
         ConnectorProfileName: !Ref ConnectorProfileName
         ChildStackPath: !Ref ChildStackPath
         S3BucketName: !Ref S3BucketName
+        QSS3BucketName: !Ref QSS3BucketName
+        QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
 
