@@ -1,32 +1,52 @@
-
 AWSTemplateFormatVersion: '2010-09-09'
 Description: 'CloudFormation Template for AppFlow'
-
 Parameters:
   AppFlowName:
     Description: "Name of the flow"
     Type: String
-    Default: Account-Saleforce
-
+    Default: Contact-Salesforce
   ConnectorProfileName:
-    Description: "Name of the salesforce connector profile"
     Type: String
+    Description: "Salesforce Connector name "
     # Default: aws_demo
-  
   ChildStackPath:
     Description: "Path to child stack cft"
     Type: String
     Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
-
   S3BucketName:
     Type: String
     Description: S3 data bucket name
-
+  QSS3BucketName:
+    AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
+    ConstraintDescription: Quick Start bucket name can include numbers, lowercase
+      letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen
+      (-).
+    Default: aws-quickstart
+    Description: S3 bucket name for the Quick Start assets. This string can include
+      numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start
+      or end with a hyphen (-).
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: ^[0-9a-zA-Z-/.]*$
+    ConstraintDescription: Quick Start key prefix can include numbers, lowercase letters,
+      uppercase letters, hyphens (-), periods (.) and forward slash (/).
+    Default: quickstart-keyrus-salesforce-reporting/
+    Description: S3 key prefix for the Quick Start assets. Quick Start key prefix
+      can include numbers, lowercase letters, uppercase letters, hyphens (-), periods (.) and
+      forward slash (/).
+    Type: String
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: Region where the Quick Start S3 bucket (QSS3BucketName) is
+      hosted. When using your own bucket, you must specify this value.
+    Type: String
+Conditions:
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
   SaleforceFlow:
     Type: AWS::AppFlow::Flow
     Properties:
-      Description: AppFlow Flow integrating Salesforce_Account with a Redshift 
+      Description: AppFlow Flow integrating Saleforce with a Redshift
 
       DestinationFlowConfigList:
         - ConnectorType: !ImportValue ConnectorType
@@ -36,84 +56,97 @@ Resources:
               BucketPrefix: !ImportValue S3BucketPrefix
               ErrorHandlingConfig:
                 FailOnFirstError: true
-                BucketPrefix: Account-Error
+                BucketPrefix: Contact-Error
                 BucketName: !ImportValue S3BucketName
               IntermediateBucketName: !ImportValue S3BucketName
-              Object: ods.account
-
+              Object: ods.contact
 
       FlowName: !Ref AppFlowName
+      # kmsARN:
       SourceFlowConfig:
         ConnectorProfileName: !Ref ConnectorProfileName
         ConnectorType: Salesforce
-        SourceConnectorProperties: 
+        SourceConnectorProperties:
           Salesforce:
             EnableDynamicFieldUpdate: false
             IncludeDeletedRecords: false
-            Object: Account
+            Object: Contact
+
       Tasks:
         - TaskType: Filter
           SourceFields:
           - Id
           - IsDeleted
-          - MasterRecordId
-          - JigsawCompanyId
-          - Jigsaw
-          - LastActivityDate
-          - PhotoUrl
-          - SystemModstamp
-          - ShippingAddress
-          - ShippingGeocodeAccuracy
-          - ShippingCountry
-          - ShippingPostalCode
-          - ShippingState
-          - ShippingCity
-          - ShippingStreet
-          - ShippingLongitude
-          - ShippingLatitude
-          - BillingAddress
-          - BillingGeocodeAccuracy
-          - BillingCountry
-          - BillingPostalCode
-          - BillingState
-          - BillingCity
-          - BillingStreet
-          - BillingLongitude
-          - BillingLatitude
-          - Website
-          - Type
-          - LastReferencedDate
-          - LastModifiedById
-          - LastViewedDate
-          - LastModifiedDate
-          - Industry
+          - FirstName
+          - Name
+          - AccountId
           - Phone
           - Fax
-          - ParentId
+          - HomePhone
+          - AssistantPhone
+          - AssistantName
+          - Email
+          - Department
+          - Birthdate
+          - Jigsaw
           - CreatedDate
-          - NumberOfEmployees
-          - AnnualRevenue
           - CreatedById
-          - AccountSource
+          - IndividualId
+          - EmailBouncedReason
+          - EmailBouncedDate
+          - IsEmailBounced
+          - MailingAddress
+          - MailingLatitude
+          - MailingLongitude
+          - MailingCountry
+          - MailingGeocodeAccuracy
+          - MailingState
+          - MailingCity
+          - Title
+          - MailingStreet
+          - OtherPhone
+          - OtherCountry
+          - OtherAddress
+          - OtherGeocodeAccuracy
+          - OtherState
+          - MailingPostalCode
+          - Salutation
+          - OtherStreet
+          - LastCURequestDate
+          - LastCUUpdateDate
+          - LastModifiedById
+          - LastActivityDate
+          - MasterRecordId
+          - LastViewedDate
+          - LastReferencedDate
+          - LastName
+          - LastModifiedDate
+          - LeadSource
+          - OtherLatitude
+          - OtherLongitude
+          - SystemModstamp
+          - OtherCity
+          - MobilePhone
+          - OtherPostalCode
+          - JigsawContactId
+          - PhotoUrl
           - OwnerId
-          - SicDesc
-          - Name
+          - ReportsToId
           - Description
           ConnectorOperator:
             Salesforce: PROJECTION
-          
 
         - TaskType: Map
           SourceFields:
             - Id
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: id
+          DestinationField: contactid
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
+              Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: id
+              Value: Id
 
         - TaskType: Map
           SourceFields:
@@ -123,124 +156,16 @@ Resources:
           DestinationField: deleted
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
+              Value: boolean
             - Key: SOURCE_DATA_TYPE
               Value: boolean
 
         - TaskType: Map
           SourceFields:
-            - MasterRecordId
+            - FirstName
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: masterrecordid
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
-            - Key: SOURCE_DATA_TYPE
-              Value: reference
-
-        - TaskType: Map
-          SourceFields:
-            - JigsawCompanyId
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: jigsawcompanyid
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-         
-        - TaskType: Map
-          SourceFields:
-            - Jigsaw
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: datacomkey
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-
-        - TaskType: Map
-          SourceFields:
-            - LastActivityDate
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: lastactivity
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
-            - Key: SOURCE_DATA_TYPE
-              Value: date
-
-        - TaskType: Map
-          SourceFields:
-            - PhotoUrl
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: photourl
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying   
-            - Key: SOURCE_DATA_TYPE
-              Value: url
-            
-        - TaskType: Map
-          SourceFields:
-            - SystemModstamp
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: systemmodstamp
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: datetime
-
-        - TaskType: Map
-          SourceFields:
-            - ShippingAddress
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippingaddress
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: address
-
-        - TaskType: Map
-          SourceFields:
-            - ShippingGeocodeAccuracy
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippinggeocodeaccuracy
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: picklist
-
-        - TaskType: Map
-          SourceFields:
-            - ShippingCountry
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippingcountry
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string 
-  
-        - TaskType: Map
-          SourceFields:
-            - ShippingPostalCode
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippingzippostalcode
+          DestinationField: firstname
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
@@ -249,267 +174,34 @@ Resources:
 
         - TaskType: Map
           SourceFields:
-            - ShippingState
+            - Name
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: shippingstateprovince
+          DestinationField: fullname
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: string
+              Value: Id
 
         - TaskType: Map
           SourceFields:
-            - ShippingCity
+            - AccountId
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: shippingcity
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-              
-        - TaskType: Map
-          SourceFields:
-            - ShippingStreet
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippingstreet
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: textarea
-
-        - TaskType: Map
-          SourceFields:
-            - ShippingLongitude
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippinglongitude
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: double
-              
-        - TaskType: Map
-          SourceFields:
-            - ShippingLatitude
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: shippinglatitude
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: double
-
-        - TaskType: Map
-          SourceFields:
-            - BillingAddress
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingaddress
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: address
-
-
-        - TaskType: Map
-          SourceFields:
-            - BillingGeocodeAccuracy
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billinggeocodeaccuracy
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: picklist
-
-        - TaskType: Map
-          SourceFields:
-            - BillingCountry
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingcountry
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-        
-        - TaskType: Map
-          SourceFields:
-            - BillingPostalCode
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingzippostalcode
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-
-        - TaskType: Map
-          SourceFields:
-            - BillingState
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingstateprovince
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-
-        - TaskType: Map
-          SourceFields:
-            - BillingCity
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingcity
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
-              
-        - TaskType: Map
-          SourceFields:
-            - BillingStreet
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billingstreet
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: textarea
-
-        - TaskType: Map
-          SourceFields:
-            - BillingLongitude
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billinglongitude
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: double
-
-
-        - TaskType: Map
-          SourceFields:
-            - BillingLatitude
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: billinglatitude
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: double
-
-
-        - TaskType: Map
-          SourceFields:
-            - Website
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: website
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: url
-
-
-        - TaskType: Map
-          SourceFields:
-            - Type
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: type
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: picklist
-
-        - TaskType: Map
-          SourceFields:
-            - LastReferencedDate
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: lastreferenceddate
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: timestamp without time zone
-            - Key: SOURCE_DATA_TYPE
-              Value: datetime
-
-        - TaskType: Map
-          SourceFields:
-            - LastModifiedById
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: lastmodifiedbyid
+          DestinationField: accountid
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
               Value: reference
-
-
-        - TaskType: Map
-          SourceFields:
-            - LastViewedDate
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: lastvieweddate
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: timestamp without time zone
-            - Key: SOURCE_DATA_TYPE
-              Value: datetime
-
-        - TaskType: Map
-          SourceFields:
-            - LastModifiedDate
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: lastmodifieddate
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: timestamp without time zone
-            - Key: SOURCE_DATA_TYPE
-              Value: datetime
-              
-        - TaskType: Map
-          SourceFields:
-            - Industry
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: industry
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: picklist
 
         - TaskType: Map
           SourceFields:
             - Phone
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: phone
+          DestinationField: businessphone
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
@@ -521,7 +213,7 @@ Resources:
             - Fax
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: fax
+          DestinationField: businessfax
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
@@ -530,16 +222,88 @@ Resources:
 
         - TaskType: Map
           SourceFields:
-            - ParentId
+            - HomePhone
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: parentid
+          DestinationField: homephone
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: reference
-              
+              Value: phone
+
+        - TaskType: Map
+          SourceFields:
+            - AssistantPhone
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: asstphone
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: phone
+
+        - TaskType: Map
+          SourceFields:
+            - AssistantName
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: assistantsname
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - Email
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: email
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: email
+
+        - TaskType: Map
+          SourceFields:
+            - Department
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: department
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - Birthdate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: birthdate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: date
+            - Key: SOURCE_DATA_TYPE
+              Value: date
+
+        - TaskType: Map
+          SourceFields:
+            - Jigsaw
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: datacomkey
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
         - TaskType: Map
           SourceFields:
             - CreatedDate
@@ -550,31 +314,7 @@ Resources:
             - Key: DESTINATION_DATA_TYPE
               Value: timestamp without time zone
             - Key: SOURCE_DATA_TYPE
-              Value: datetime        
-
-        - TaskType: Map
-          SourceFields:
-            - NumberOfEmployees
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: numberofemployees
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: int
-
-        - TaskType: Map
-          SourceFields:
-            - AnnualRevenue
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: annualrevenue
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: numeric
-            - Key: SOURCE_DATA_TYPE
-              Value: currency
+              Value: datetime
 
         - TaskType: Map
           SourceFields:
@@ -590,15 +330,471 @@ Resources:
 
         - TaskType: Map
           SourceFields:
-            - AccountSource
+            - IndividualId
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: accountsource
+          DestinationField: individualid
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: picklist          
+              Value: reference
+
+        - TaskType: Map
+          SourceFields:
+            - EmailBouncedReason
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: emailbouncedreason
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - EmailBouncedDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: emailbounceddate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - IsEmailBounced
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: isemailbounced
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: boolean
+            - Key: SOURCE_DATA_TYPE
+              Value: boolean
+
+        - TaskType: Map
+          SourceFields:
+            - MailingAddress
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingaddress
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: address
+
+        - TaskType: Map
+          SourceFields:
+            - MailingLatitude
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailinglatitude
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: numeric
+            - Key: SOURCE_DATA_TYPE
+              Value: double
+
+        - TaskType: Map
+          SourceFields:
+            - MailingLongitude
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailinglongitude
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: numeric
+            - Key: SOURCE_DATA_TYPE
+              Value: double
+
+        - TaskType: Map
+          SourceFields:
+            - MailingCountry
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingcountry
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - MailingGeocodeAccuracy
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailinggeocodeaccuracy
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: picklist
+
+        - TaskType: Map
+          SourceFields:
+            - MailingState
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingstateprovince
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - MailingCity
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingcity
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - Title
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: title
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - MailingStreet
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingstreet
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: textarea
+
+        - TaskType: Map
+          SourceFields:
+            - OtherPhone
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherphone
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: phone
+
+        - TaskType: Map
+          SourceFields:
+            - OtherCountry
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: othercountry
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - OtherAddress
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otheraddress
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: adress
+
+        - TaskType: Map
+          SourceFields:
+            - OtherGeocodeAccuracy
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: othergeocodeaccuracy
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: picklist
+
+        - TaskType: Map
+          SourceFields:
+            - OtherState
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherstateprovince
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - MailingPostalCode
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mailingzippostalcode
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - Salutation
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: salutation
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: picklist
+
+        - TaskType: Map
+          SourceFields:
+            - OtherStreet
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherstreet
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: textarea
+
+        - TaskType: Map
+          SourceFields:
+            - LastCURequestDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: laststayintouchrequestdate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - LastCUUpdateDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: laststayintouchsavedate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - LastModifiedById
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastmodifiedbyid
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: reference
+
+        - TaskType: Map
+          SourceFields:
+            - LastActivityDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastactivity
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: date
+            - Key: SOURCE_DATA_TYPE
+              Value: date
+
+        - TaskType: Map
+          SourceFields:
+            - MasterRecordId
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: masterrecordid
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: reference
+
+        - TaskType: Map
+          SourceFields:
+            - LastViewedDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastvieweddate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: timestamp without time zone
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - LastReferencedDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastreferenceddate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: timestamp without time zone
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - LastName
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastname
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - LastModifiedDate
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: lastmodifieddate
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: timestamp without time zone
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - LeadSource
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: leadsource
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: picklist
+
+        - TaskType: Map
+          SourceFields:
+            - OtherLatitude
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherlatitude
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: numeric
+            - Key: SOURCE_DATA_TYPE
+              Value: double
+
+        - TaskType: Map
+          SourceFields:
+            - OtherLongitude
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherlongitude
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: numeric
+            - Key: SOURCE_DATA_TYPE
+              Value: double
+
+        - TaskType: Map
+          SourceFields:
+            - SystemModstamp
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: systemmodstamp
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: timestamp without time zone
+            - Key: SOURCE_DATA_TYPE
+              Value: datetime
+
+        - TaskType: Map
+          SourceFields:
+            - OtherCity
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: othercity
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - MobilePhone
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: mobilephone
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: phone
+
+        - TaskType: Map
+          SourceFields:
+            - OtherPostalCode
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: otherzippostalcode
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - JigsawContactId
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: jigsawcontactid
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: string
+
+        - TaskType: Map
+          SourceFields:
+            - PhotoUrl
+          ConnectorOperator:
+            Salesforce: NO_OP
+          DestinationField: photourl
+          TaskProperties:
+            - Key: DESTINATION_DATA_TYPE
+              Value: character varying
+            - Key: SOURCE_DATA_TYPE
+              Value: url
 
         - TaskType: Map
           SourceFields:
@@ -610,38 +806,26 @@ Resources:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: reference  
+              Value: reference
 
         - TaskType: Map
           SourceFields:
-            - SicDesc
+            - ReportsToId
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: sicdescription
+          DestinationField: reportstoid
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
             - Key: SOURCE_DATA_TYPE
-              Value: string
-
-        - TaskType: Map
-          SourceFields:
-            - Name
-          ConnectorOperator:
-            Salesforce: NO_OP
-          DestinationField: name
-          TaskProperties:
-            - Key: DESTINATION_DATA_TYPE
-              Value: character varying
-            - Key: SOURCE_DATA_TYPE
-              Value: string
+              Value: reference
 
         - TaskType: Map
           SourceFields:
             - Description
           ConnectorOperator:
             Salesforce: NO_OP
-          DestinationField: description
+          DestinationField: contactdescription
           TaskProperties:
             - Key: DESTINATION_DATA_TYPE
               Value: character varying
@@ -658,11 +842,9 @@ Resources:
     DependsOn: SaleforceFlow
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub ${ChildStackPath}/activate-appflow-lambda.cft.yaml
+      TemplateURL: !Sub
+        - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/activate-appflow-lambda.template.yaml'
+        - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
+          S3Bucket: !If [ UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName ]
       Parameters:
         AppFlowName: !Ref AppFlowName
-        
-Outputs:
-  AppFlowName:
-    Value: !Ref AppFlowName
-    Description: Appflow name Account
