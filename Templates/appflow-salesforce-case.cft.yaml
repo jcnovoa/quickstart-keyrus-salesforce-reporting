@@ -5,7 +5,7 @@ Parameters:
     Description: "Name of the flow"
     Type: String
     Default: Case-Saleforce
-  ConnectorProfileName: 
+  ConnectorProfileName:
     Type: String
     Description: "Salesforce Connector name "
     # Default: aws_demo
@@ -20,7 +20,7 @@ Resources:
   SaleforceFlow:
     Type: AWS::AppFlow::Flow
     Properties:
-      Description: AppFlow Flow integrating Salesforce with a Redshift 
+      Description: AppFlow Flow integrating Salesforce with a Redshift
 
       DestinationFlowConfigList:
         - ConnectorType: !ImportValue ConnectorType
@@ -40,7 +40,7 @@ Resources:
       SourceFlowConfig:
         ConnectorProfileName: !Ref ConnectorProfileName
         ConnectorType: Salesforce
-        SourceConnectorProperties: 
+        SourceConnectorProperties:
           Salesforce:
             EnableDynamicFieldUpdate: false
             IncludeDeletedRecords: false
@@ -505,6 +505,6 @@ Resources:
     DependsOn: SaleforceFlow
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub ${ChildStackPath}/activate-appflow-lambda.cft.yaml
+      TemplateURL: !Sub ${ChildStackPath}/activate-appflow-lambda.template.yaml
       Parameters:
         AppFlowName: !Ref AppFlowName
