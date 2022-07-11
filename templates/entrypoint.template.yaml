@@ -1,6 +1,8 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Root CloudFormation Template (qs-1t7ksiu2s)
 Metadata:
+  QSLint:
+    Exclusions: [ W9002, W9003, W9004, W9006 ]
   QuickStartDocumentation:
     EntrypointName: "Launch into a new VPC"
     Order: 1
