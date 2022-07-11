@@ -1,32 +1,66 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Salesforce Redshift Stack with network setup
+Description: Salesforce Redshift Stack with network setup (qs-1t7ksiu5f)
+Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
+    Order: 1
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Redshift configuration
+        Parameters:
+          - RedShiftUsername
+          - RedShiftUserPassword
+          - S3BucketPrefix
+          - EnableLoggingToS3
+          - ConnectorProfileName
+          - ConnectionModeVal
+          - ConnectorType
+          - NumberOfNodes
+          - NodeType
+          - EncryptionAtRest
+          - KMSKey
+    ParameterLabels:
+      QSS3BucketName:
+        default: Quick Start S3 bucket name
+      QSS3KeyPrefix:
+        default: Quick Start S3 key prefix
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket Region
+      NodeType:
+        default: Node type
+      S3BucketName:
+        default: Bucket for AppFlow
+      RedShiftUsername:
+        default: Redshift User Name
+      RedShiftUserPassword:
+        default: Redshift User Password
+      S3BucketPrefix:
+        default: S3 Bucket Prefix for logging bucket
+      EnableLoggingToS3:
+        default: Enables or disables logging to an S3 bucket.
+      ConnectorProfileName:
+        default: Connection Profile name for RedShift.
+      ConnectionModeVal:
+        default: Connection Mode for Connection Profile
+      ConnectorType:
+        default: Connection Profile Type
+      EncryptionAtRest:
+        default: Enables or disables encryption at rest of the Redshift database.
+      KMSKey:
+        default: KMS key used for RedShift encryption at rest
 Parameters:
-
-  ## Database Settings ##
-  DatabaseName:
-    Default: dev
-    Type: String
-    Description: Database name
-  MasterUsername:
+  RedShiftUsername:
     Type: String
     Description: Master user name for Redshift
-    # Default: vitalii
-  MasterUserPassword:
-    # Default: 9YGGbgU7Ltd
-    Description: Master password for Redshift (used mixed case and numbers) Make Sure this is solid something with special chars.
+  RedShiftUserPassword:
+    Description: Master password for Redshift (used mixed case and numbers) Make Sure this is solid something with special characters.
     Type: String
-    # NoEcho: 'true'
-    # MinLength: '8'
-    # MaxLength: '64'
-    # AllowedPattern: >-
-    #  ^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?!._*[@/\\\"']).*$
-    # ConstraintDescription: >-
-    #  Enter alphanumeric password for the master user. The password must contain 8 to 64 printable ASCII characters, excluding: /, ", \'', \ and @. It must contain one uppercase letter, one lowercase letter, and one number.
-    
-  ## End Database Settings ## 
-  
-  ## Node Setup ## 
-
+    NoEcho: 'true'
+    MinLength: '8'
+    MaxLength: '64'
+    AllowedPattern: ^(?=^.{8,255}$)(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])(?!.*[@/"']).*$
+    ConstraintDescription: "Min 8 chars. Must include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
   NumberOfNodes:
     Description: >-
       The number of compute nodes in the cluster. For multi-node clusters, the NumberOfNodes parameter must be greater than 1.
@@ -35,17 +69,12 @@ Parameters:
   NodeType:
     Description: The type of node to be provisioned
     Type: String
-    Default: dc2.large 
+    Default: dc2.large
     AllowedValues:
       - dc2.large
       - dc2.8xlarge
       - ds2.xlarge
       - ds2.8xlarge
-
-  ## End Node Setup ## 
-
-  ## Encryption Settings ES ## 
-
   EncryptionAtRest:
     Description: Enables or disables encryption at rest of the Redshift database.
     Type: String
@@ -54,27 +83,17 @@ Parameters:
       - true
       - false
     ConstraintDescription: must be true or false.
-
-  kmskey:
+  KMSKey:
     Description: The existing KMS key ID for encrypting Redshift database at-rest ( Add if EncryptionAtRest enabled ).
     Type: String
     Default: ''
-
-  ## End ES ## 
-
-
-  ## S3 Settings ## 
-
   S3BucketName:
     Type: String
     Description: S3 data bucket name
-    Default: 'aws-appflow-s3-bucket'
-
   S3BucketPrefix:
-    Description: The Prefix name for the S3 Bucket 
+    Description: The Prefix name for the S3 Bucket
     Type: String
     Default: 'Logs'
-
   EnableLoggingToS3:
     Default: 'true'
     Type: String
@@ -82,7 +101,6 @@ Parameters:
       - true
       - false
     Description: Enables or disables logging to an S3 bucket.  To enable logging, select True.
-
   ConnectionModeVal:
     Default: 'Public'
     Type: String
@@ -90,12 +108,10 @@ Parameters:
       - 'Public'
       - 'Private'
     Description: Connection Mode for Connection Profile
-
   ConnectorProfileName:
     Default: 'Hello'
     Type: String
     Description: Connection Profile Name
-
   ConnectorType:
     Default: 'Redshift'
     Type: String
@@ -103,9 +119,6 @@ Parameters:
       - 'Redshift'
       - 'Salesforce'
     Description: Connection Profile Type
-
-  ## End S3 S3S ## 
-  
 Conditions:
   IsGovCloud: !Equals [!Ref 'AWS::Region', 'us-gov-west-1']
   RedshiftSingleNodeClusterCondition:
@@ -133,13 +146,13 @@ Resources:
       VpcId: !Ref VPC
       InternetGatewayId: !Ref InternetGateway
 
-  ## Public Subnets ## 
+  ## Public Subnets ##
   PublicSubnetA:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.1.10.0/24
-      AvailabilityZone: !Select [ 0, !GetAZs ]    # Get the first AZ in the list       
+      AvailabilityZone: !Select [ 0, !GetAZs ]    # Get the first AZ in the list
       Tags:
       - Key: Name
         Value: !Sub ${AWS::StackName}-Public-A
@@ -148,13 +161,13 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: 10.1.20.0/24
-      AvailabilityZone: !Select [ 1, !GetAZs ]    # Get the second AZ in the list 
+      AvailabilityZone: !Select [ 1, !GetAZs ]    # Get the second AZ in the list
       Tags:
       - Key: Name
         Value: !Sub ${AWS::StackName}-Public-B
-  ## END Public Subnets ## 
+  ## END Public Subnets ##
 
-  ## Route Tables ## 
+  ## Route Tables ##
   PublicRouteTable:
     Type: AWS::EC2::RouteTable
     Properties:
@@ -168,7 +181,7 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       DestinationCidrBlock: 0.0.0.0/0
-      GatewayId: !Ref InternetGateway 
+      GatewayId: !Ref InternetGateway
   # Attach the public subnets to public route tables,
   PublicSubnetARouteTableAssociation:
     Type: AWS::EC2::SubnetRouteTableAssociation
@@ -180,10 +193,10 @@ Resources:
     Properties:
       SubnetId: !Ref PublicSubnetB
       RouteTableId: !Ref PublicRouteTable
-  
+
   ## End RT's ##
 
-  ## S3 Bucket ## 
+  ## S3 Bucket ##
 
   RedshiftLoggingS3Bucket:
     Type: 'AWS::S3::Bucket'
@@ -201,7 +214,7 @@ Resources:
 
   ## S3 Bucket End ##
 
-  ## Lambda ## 
+  ## Lambda ##
 
   LambdaRedShiftRunOnStart:
     Type: AWS::Lambda::Function
@@ -213,8 +226,8 @@ Resources:
       Timeout: 180
       Code:
         ZipFile: !Sub |
-          import json 
-          import time 
+          import json
+          import time
           import unicodedata
           import traceback
           import sys
@@ -225,7 +238,7 @@ Resources:
           import redshift_connector
 
           def handler(event, context):
-            ## Everything below try block is indented inside it 
+            ## Everything below try block is indented inside it
             conn = redshift_connector.connect(
               host="${RedshiftCluster.Endpoint.Address}",
               database="${DatabaseName}",
@@ -234,7 +247,7 @@ Resources:
             )
             cur: redshift_connector.Cursor = conn.cursor()
             cur.execute("create schema ods")
-            conn.commit() 
+            conn.commit()
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS ods.account
                 (
@@ -293,8 +306,8 @@ Resources:
                 SICDescription          Text
                 )
             """)
-            conn.commit() 
-            cur.execute(""" 
+            conn.commit()
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS ods.contact
                 (
                 ContactID                  varchar(18),
@@ -355,12 +368,12 @@ Resources:
                 DatacomKey                 varchar(50),
                 JigsawContactID            varchar(50),
                 IndividualID               varchar(50)
-                )         
-                        
+                )
+
             """)
-            
-            conn.commit() 
-            cur.execute(""" 
+
+            conn.commit()
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS ods.case
                 (
                 CaseID             varchar(18),
@@ -398,11 +411,11 @@ Resources:
                 LastViewedDate     timestamp,
                 LastReferencedDate timestamp,
                 CustomCreateDate   timestamp
-                )      
+                )
             """)
-            
-            conn.commit() 
-            cur.execute(""" 
+
+            conn.commit()
+            cur.execute("""
                 CREATE TABLE IF NOT EXISTS ods.lead
                 (
                 LeadID                  varchar(100),
@@ -456,7 +469,7 @@ Resources:
                 IndividualID            varchar(100)
                 )
             """)
-            conn.commit() 
+            conn.commit()
             cur.execute("""
                 CREATE TABLE IF NOT EXISTS ods.opportunity
                 (
@@ -494,10 +507,10 @@ Resources:
                 HasOpenActivity       boolean,
                 HasOverdueTask        boolean,
                 OpportunityHistoryID  varchar(18)
-                )           
+                )
             """)
-         
-            conn.commit() 
+
+            conn.commit()
             responseValue = 120
             responseData = {}
             responseData['Data'] = responseValue
@@ -508,7 +521,7 @@ Resources:
             responseBody = json.dumps(responseBody)
             return responseBody
 
-    
+
   Primerinvoke:
     Type: AWS::CloudFormation::CustomResource
     DependsOn: LambdaRedShiftRunOnStart
@@ -517,32 +530,32 @@ Resources:
     Properties:
       ServiceToken: !GetAtt LambdaRedShiftRunOnStart.Arn
 
-  ## End Lambda ## 
+  ## End Lambda ##
 
-  ## S3 Bucket Policy ## 
+  ## S3 Bucket Policy ##
 
   RedshiftLoggingS3Policy:
     Type: AWS::IAM::Policy
     Properties:
       PolicyName: RedshiftLoggingS3Policy
-      PolicyDocument: 
+      PolicyDocument:
         Version: 2012-10-17
         Statement:
-          - 
+          -
             Effect: Allow
             Action: s3:ListAllMyBuckets
             Resource: arn:aws:s3:::*
-          - 
+          -
             Effect: Allow
-            Action: 
+            Action:
               - 's3:*'
             Resource: '*'
-          - 
+          -
             Effect: Allow
             Action: cloudwatch:*
             Resource: "*"
       Roles:
-        - !Ref RedshiftIAMRole  
+        - !Ref RedshiftIAMRole
 
   RedshiftLoggingS3BucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -583,9 +596,9 @@ Resources:
             Resource:
               - !Sub arn:aws:s3:::${S3BucketName}
               - !Sub arn:aws:s3:::${S3BucketName}/*
-              
 
-  ## End S3 Bucket Policy ## 
+
+  ## End S3 Bucket Policy ##
 
   ## IAM Roles ##
 
@@ -598,12 +611,12 @@ Resources:
         Statement:
           -
             Effect: "Allow"
-            Action: 
+            Action:
             - 's3:*'
             Principal:
               Service:
                 - "redshift.amazonaws.com"
-            
+
             Action:
               - "sts:AssumeRole"
 
@@ -653,27 +666,27 @@ Resources:
           FromPort: 5439
           ToPort: 5439
           IpProtocol: tcp
-          Description: IP address for your dev machine  
-  
+          Description: IP address for your dev machine
+
   RedshiftCluster:
     Type: AWS::Redshift::Cluster
     DependsOn: RedshiftSecurityGroup
     DependsOn: AttachGateway
     Properties:
       ClusterSubnetGroupName: !Ref RedshiftClusterSubnetGroup
-      ClusterType: !If [RedshiftSingleNodeClusterCondition, "single-node", "multi-node"]  
+      ClusterType: !If [RedshiftSingleNodeClusterCondition, "single-node", "multi-node"]
       NumberOfNodes: !If [RedshiftSingleNodeClusterCondition, !Ref "AWS::NoValue", !Ref NumberOfNodes]
       DBName: !Sub ${DatabaseName}
-      KmsKeyId: !If [IsEncryptionAtRest, !Ref kmskey, !Ref "AWS::NoValue"]
+      KmsKeyId: !If [IsEncryptionAtRest, !Ref KMSKey, !Ref "AWS::NoValue"]
       Encrypted: !Ref EncryptionAtRest
-      MasterUserPassword: !Ref MasterUserPassword
-      MasterUsername: !Ref MasterUsername
+      MasterUserPassword: !Ref RedShiftUserPassword
+      MasterUsername: !Ref RedShiftUsername
       PubliclyAccessible: true
       NodeType: !Ref NodeType
       Port: 5439
       VpcSecurityGroupIds:
         - !Sub ${RedshiftSecurityGroup}
-      LoggingProperties: !If 
+      LoggingProperties: !If
         - IsEnableLoggingToS3
         - BucketName: !Ref S3BucketName
           S3KeyPrefix: !Ref S3BucketPrefix
@@ -712,15 +725,15 @@ Resources:
 
 Outputs:
 
-  ConnectorType: 
+  ConnectorType:
     Value: !Ref ConnectorType
-    Description: Type of connection 
-    Export: 
+    Description: Type of connection
+    Export:
       Name: "ConnectorType"
 
   ConnectorProfileName:
     Value : !Ref ConnectorProfileName
-    Description: Connector Profile Name 
+    Description: Connector Profile Name
     Export:
       Name: "CPRN"
 
@@ -748,7 +761,7 @@ Outputs:
 
   DataBaseEndpoint:
     Value: !Sub ${RedshiftCluster.Endpoint.Address}
-    Description: RedshiftCluster Database Endpoint 
+    Description: RedshiftCluster Database Endpoint
     Export:
       Name: "RedshiftClusterDatabaseName"
 

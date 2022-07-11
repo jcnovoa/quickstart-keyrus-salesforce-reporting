@@ -1,5 +1,15 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation Template for LambdaFunction for activate a AppflowLogs'
+Description: CloudFormation Template for LambdaFunction for activate a AppflowLogs (qs-1t7ksiu7p)
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic configuration
+        Parameters:
+          - AppFlowName
+    ParameterLabels:
+      AppFlowName:
+        Default: Name of the flow
 Parameters:
   AppFlowName:
     Description: "Name of the flow to activate"
@@ -19,15 +29,15 @@ Resources:
               - lambda.amazonaws.com
               - redshift.amazonaws.com
             Action:
-            - sts:AssumeRole  
+            - sts:AssumeRole
         Path: "/"
         ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
-        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
-        - arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy
-        - arn:aws:iam::aws:policy/SecretsManagerReadWrite
-        - arn:aws:iam::aws:policy/AmazonAppFlowFullAccess
-        - arn:aws:iam::aws:policy/AmazonS3FullAccess
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/SecretsManagerReadWrite
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonAppFlowFullAccess
+        - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonS3FullAccess
 
   ActivateAppFlowOnStart:
     Type: AWS::Lambda::Function
@@ -37,14 +47,14 @@ Resources:
       Role: !GetAtt LambdaExecutionRole.Arn
       Runtime: python3.7
       Timeout: 180
-      Code:    
+      Code:
         ZipFile: !Sub |
           import json
           import time
           import boto3
           import cfnresponse
 
-          
+
           def describe_connector(event, context):
            response = client.describe_connectors( connectorTypes=[])
            return {'response': response['connectorConfigurations']}

@@ -1,5 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'CloudFormation Template for AppFlow'
+Description: CloudFormation Template for AppFlow (qs-1t7ksiu78)
+Metadata:
+ AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Basic configuration
+        Parameters:
+          - AppFlowName
+          - ConnectorProfileName
+          - QSS3BucketName
+          - QSS3KeyPrefix
+          - QSS3BucketRegion
+    ParameterLabels:
+      QSS3BucketName:
+        default: Quick Start S3 bucket name
+      QSS3KeyPrefix:
+        default: Quick Start S3 key prefix
+      QSS3BucketRegion:
+        default: Quick Start S3 bucket Region
+      ConnectorProfileName:
+       default: Connector Name
+      AppFlowName:
+        Default: Name of the flow
 Parameters:
   AppFlowName:
     Description: "Name of the flow"
@@ -8,14 +30,6 @@ Parameters:
   ConnectorProfileName:
     Type: String
     Description: "Salesforce Connector name "
-    # Default: aws_demo
-  ChildStackPath:
-    Description: "Path to child stack cfts"
-    Type: String
-    Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
-  S3BucketName:
-    Type: String
-    Description: S3 data bucket name
   QSS3BucketName:
     AllowedPattern: ^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$
     ConstraintDescription: Quick Start bucket name can include numbers, lowercase
