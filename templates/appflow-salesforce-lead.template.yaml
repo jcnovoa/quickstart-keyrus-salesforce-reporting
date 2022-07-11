@@ -4,7 +4,7 @@ Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch Lead Appflow"
     Order: 6
- AWS::CloudFormation::Interface:
+  AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
           default: Basic configuration

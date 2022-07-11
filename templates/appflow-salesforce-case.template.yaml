@@ -4,7 +4,7 @@ Metadata:
   QuickStartDocumentation:
     EntrypointName: "Launch Case Appflow"
     Order: 4
- AWS::CloudFormation::Interface:
+  AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
           default: Basic configuration

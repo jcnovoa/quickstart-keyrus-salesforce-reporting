@@ -129,7 +129,6 @@ Conditions:
   IsEnableLoggingToS3: !And
     - !Equals [!Ref EnableLoggingToS3, 'true']
     - !Not [!Condition IsGovCloud]
-
 Resources:
   VPC:
     Type: AWS::EC2::VPC
