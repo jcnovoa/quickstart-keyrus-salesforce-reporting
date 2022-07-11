@@ -2,8 +2,8 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Salesforce Redshift Stack with network setup (qs-1t7ksiu5f)
 Metadata:
   QuickStartDocumentation:
-    EntrypointName: "Launch into a new VPC"
-    Order: 1
+    EntrypointName: "Launch Redshift"
+    Order: 2
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:

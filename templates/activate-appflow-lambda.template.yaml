@@ -1,6 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: CloudFormation Template for LambdaFunction for activate a AppflowLogs (qs-1t7ksiu7p)
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch AppFlow Lamda"
+    Order: 8
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:

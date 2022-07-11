@@ -199,7 +199,7 @@ Parameters:
 Conditions:
   UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
 Resources:
-  SaleforceRedshift:
+  SaleForceRedshift:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
@@ -220,7 +220,7 @@ Resources:
         S3BucketPrefix: !Ref S3BucketPrefix
         EnableLoggingToS3: !Ref EnableLoggingToS3
   AppflowAccount:
-    DependsOn: SaleforceRedshift
+    DependsOn: SaleForceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
@@ -234,7 +234,7 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
   AppflowCase:
-    DependsOn: SaleforceRedshift
+    DependsOn: SaleForceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
@@ -246,7 +246,7 @@ Resources:
         S3BucketName: !Ref S3BucketName
         AppFlowName: !Ref CaseAppFlowName
   AppflowContact:
-    DependsOn: SaleforceRedshift
+    DependsOn: SaleForceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
@@ -260,7 +260,7 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
   AppflowLead:
-    DependsOn: SaleforceRedshift
+    DependsOn: SaleForceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
@@ -274,7 +274,7 @@ Resources:
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
   AppflowOpportunity:
-    DependsOn: SaleforceRedshift
+    DependsOn: SaleForceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: !Sub
