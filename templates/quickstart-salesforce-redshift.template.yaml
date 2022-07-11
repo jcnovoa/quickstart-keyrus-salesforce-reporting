@@ -524,8 +524,9 @@ Resources:
 
   Primerinvoke:
     Type: AWS::CloudFormation::CustomResource
-    DependsOn: LambdaRedShiftRunOnStart
-    DependsOn: RedshiftCluster
+    DependsOn:
+      - LambdaRedShiftRunOnStart
+      - RedshiftCluster
     Version: "1.0"
     Properties:
       ServiceToken: !GetAtt LambdaRedShiftRunOnStart.Arn
