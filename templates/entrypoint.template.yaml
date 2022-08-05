@@ -55,7 +55,7 @@ Metadata:
         default: Quick Start S3 key prefix
       QSS3BucketRegion:
         default: Quick Start S3 bucket Region
-      ClassB: 
+      ClassB:
         default: Class B of VPC
       RemoteAccessCIDR:
         default: Comma-delimited list of three CIDR IPs in us-east-1
@@ -67,7 +67,7 @@ Metadata:
         default: The number of compute nodes in the cluster
       NodeType:
         default: The node type determines the CPU, RAM, storage capacity, and storage drive type for each node
-      AutoPasswordRotationIntervalDays: 
+      AutoPasswordRotationIntervalDays:
         default: Password rotation refers to the changing/resetting of a password(s)
       S3BucketPrefix:
         default: S3 Bucket Prefix for logging bucket
@@ -75,25 +75,25 @@ Metadata:
         default: Enables or disables logging to an S3 bucket.
       MasterUsername:
         default: Connection Profile name for RedShift
-      MaxConcurrentCluster: 
+      MaxConcurrentCluster:
         default: The maximum number of concurrency scaling Redshift clusters
       ConnectionModeVal:
         default: Connection Mode for Connection Profile
       ConnectorType:
         default: Connection Profile Type
-      TagName: 
-        default: Company name 
+      TagName:
+        default: Company name
       TagEnvironment:
         default: Environment tag
-      ConnectorProfileName: 
+      ConnectorProfileName:
         default: Connection name for Redshift cluster
-      MaintenanceTrack: 
+      MaintenanceTrack:
         default: Amazon Redshift version to apply during a maintenance window
       EnableVPCEnhancedRouting:
         default: Enhanced VPC routing in Amazon Redshift
-      EnableAQUA: 
+      EnableAQUA:
         default: Advanced Query Accelerator
-      ConcurrencyScaling: 
+      ConcurrencyScaling:
         default: You can support virtually unlimited concurrent users and concurrent queries, with consistently fast query performance.
       EncryptionAtRest:
         default: Enables or disables encryption at rest of the Redshift database.
@@ -107,7 +107,7 @@ Metadata:
         default: "Name of the Account object flow"
       OpportunitySalesforce:
         default: "Name of the Oportunity object flow"
-      ConnectorProfileNameSalesforce: 
+      ConnectorProfileNameSalesforce:
         default: Production radio box from the Salesforce environment section (connection Must be created before deploying )
 Parameters:
   QSS3BucketName:
@@ -134,7 +134,7 @@ Parameters:
     Description: Region where the Quick Start S3 bucket (QSS3BucketName) is
       hosted. When using your own bucket, you must specify this value.
     Type: String
-  # ChildStackPath: 
+  # ChildStackPath:
     # Description: "Path to child stack cfts"
     # Type: String
     # Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
@@ -148,7 +148,7 @@ Parameters:
   RemoteAccessCIDR:
     Description: Comma-delimited list of three CIDR IPs
     Type: String
-    Default: "3.235.189.100/30,3.235.189.96/30,44.194.111.224/30" 
+    Default: "3.235.189.100/30,3.235.189.96/30,44.194.111.224/30"
   DatabaseName:
     Description: The name of the first database to be created when the cluster is created.
     Type: String
@@ -163,7 +163,7 @@ Parameters:
     Type: Number
     Default: '2'
   NodeType:
-    Description: The type of node to be provisioned 
+    Description: The type of node to be provisioned
     Type: String
     Default: dc2.large
     AllowedValues:
@@ -269,24 +269,24 @@ Parameters:
     AllowedValues:
       - 'Redshift'
       # - 'Salesforce'
-    Description: Connection Profile Type   
+    Description: Connection Profile Type
   AccountSalesforce:
     Description: Salesforce Account Objects
     Default: Account-Salesforce
     Type: String
-  CaseSalesforce: 
+  CaseSalesforce:
     Description: Salesforce Case Objects
     Default: Case-Salesforce
     Type: String
-  ContactSalesforce: 
+  ContactSalesforce:
     Description: Salesforce Contact Objects
     Default: Contact-Salesforce
     Type: String
-  LeadSalesforce: 
+  LeadSalesforce:
     Description: Salesforce Lead Objects
     Default: Lead-Salesforce
     Type: String
-  OpportunitySalesforce: 
+  OpportunitySalesforce:
     Description: Salesforce Opportunity Objects
     Default: Opportunity-Salesforce
     Type: String
@@ -300,9 +300,11 @@ Conditions:
 Resources:
   SalesforceRedshift:
     Type: AWS::CloudFormation::Stack
-    Description: Create VPC, RedShift,S3,etc 
     Properties:
-      TemplateURL: !Sub ${ChildStackPath}/quickstart-salesforce-redshift.template.yaml
+      TemplateURL: !Sub
+        - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/quickstart-salesforce-redshift.template.yaml'
+        - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
+          S3Bucket: !If [ UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName ]
       Parameters:
         ClassB: !Ref ClassB
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
@@ -330,7 +332,6 @@ Resources:
     DependsOn: SalesforceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
-      # TemplateURL: !Sub ${ChildStackPath}/appflow-salesforce-account.template.yaml
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/appflow-salesforce-account.template.yaml'
         - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
@@ -340,12 +341,11 @@ Resources:
         ConnectorProfileNameSalesforce: !Ref ConnectorProfileNameSalesforce
         QSS3BucketName: !Ref QSS3BucketName
         QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
-        
+
   AppflowCase:
     DependsOn: SalesforceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
-      # TemplateURL: !Sub ${ChildStackPath}/appflow-salesforce-case.template.yaml
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/appflow-salesforce-case.template.yaml'
         - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
@@ -353,14 +353,11 @@ Resources:
       Parameters:
         CaseSalesforce: !Ref CaseSalesforce
         ConnectorProfileNameSalesforce: !Ref ConnectorProfileNameSalesforce
-        # QSS3BucketName: !Ref QSS3BucketName
-        # QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
 
   AppflowContact:
     DependsOn: SalesforceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
-      # TemplateURL: !Sub ${ChildStackPath}/appflow-salesforce-contact.template.yaml
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/appflow-salesforce-contact.template.yaml'
         - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
@@ -368,14 +365,12 @@ Resources:
       Parameters:
         ContactSalesforce: !Ref ContactSalesforce
         ConnectorProfileNameSalesforce: !Ref ConnectorProfileNameSalesforce
-        # QSS3BucketName: !Ref QSS3BucketName
-        # QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
+
 
   AppflowLead:
     DependsOn: SalesforceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
-      # TemplateURL: !Sub ${ChildStackPath}/appflow-salesforce-lead.template.yaml
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/appflow-salesforce-lead.template.yaml'
         - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
@@ -383,13 +378,11 @@ Resources:
       Parameters:
         LeadSalesforce: !Ref LeadSalesforce
         ConnectorProfileNameSalesforce: !Ref ConnectorProfileNameSalesforce
-        # QSS3BucketName: !Ref QSS3BucketName
-        # QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
+
   AppflowOpportunity:
     DependsOn: SalesforceRedshift
     Type: AWS::CloudFormation::Stack
     Properties:
-      # TemplateURL: !Sub ${ChildStackPath}/appflow-salesforce-opportunity.template.yaml
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/appflow-salesforce-opportunity.template.yaml'
         - S3Region: !If [ UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion ]
@@ -397,5 +390,4 @@ Resources:
       Parameters:
         OpportunitySalesforce: !Ref OpportunitySalesforce
         ConnectorProfileNameSalesforce: !Ref ConnectorProfileNameSalesforce
-        # QSS3BucketName: !Ref QSS3BucketName
-        # QSS3KeyPrefix: !Sub '${QSS3KeyPrefix}'
+
