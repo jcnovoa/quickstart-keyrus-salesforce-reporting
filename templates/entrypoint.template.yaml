@@ -77,8 +77,12 @@ Metadata:
         default: Public subnet 1 CIDR
       PublicSubnet2CIDR:
         default: Public subnet 2 CIDR
-      RemoteAccessCIDR:
+      RemoteAccessCIDR1:
         default: Comma-delimited list of three CIDR IPs in us-east-1
+      RemoteAccessCIDR2:
+        default: Comma-delimited list of three CIDR IPs in us-east-1  
+      RemoteAccessCIDR3:
+        default: Comma-delimited list of three CIDR IPs in us-east-1      
       DatabaseName:
         default: The name of the first database to be created when the cluster is created
       RedshiftClusterPort:

@@ -45,7 +45,11 @@ Metadata:
       default: Public subnet 1 CIDR
     PublicSubnet2ID:
       default: Public subnet 1 CIDR
-    RemoteAccessCIDR:
+    RemoteAccessCIDR1:
+      default: Allowed external access CIDR
+    RemoteAccessCIDR2:
+      default: Allowed external access CIDR
+    RemoteAccessCIDR3:
       default: Allowed external access CIDR
     VPCCIDR:
       default: VPC CIDR
