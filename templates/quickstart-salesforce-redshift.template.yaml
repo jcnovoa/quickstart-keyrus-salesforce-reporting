@@ -28,68 +28,99 @@ Metadata:
           - MaintenanceTrack
           - TagName
           - TagEnvironment
-          - RemoteAccessCIDR
-          - Subnet1
-          - Subnet2
           - VPCCIDR
-    ParameterLabels:
-      RemoteAccessCIDR:
-        default: Allowed external access CIDR
-      VPCCIDR:
-        default: VPC CIDR
-      Subnet1:
-        default: Subnet 1 ID
-      Subnet2:
-        default: Subnet 2 ID
-      DatabaseName:
-        default: The name of the first database to be created when the cluster is created
-      RedshiftClusterPort:
-        default: Redshift database clusters are not using their default endpoint port
-      NumberOfNodes:
-        default: The number of compute nodes in the cluster
-      NodeType:
-        default: The node type determines the CPU, RAM, storage capacity, and storage drive type for each node
-      AutoPasswordRotationIntervalDays:
-        default: Password rotation refers to the changing/resetting of a password(s)
-      S3BucketPrefix:
-        default: S3 Bucket Prefix for logging bucket
-      EnableLoggingToS3:
-        default: Enables or disables logging to an S3 bucket.
-      MasterUsername:
-        default: Connection Profile name for RedShift
-      MaxConcurrentCluster:
-        default: The maximum number of concurrency scaling Redshift clusters
-      ConnectionModeVal:
-        default: Connection Mode for Connection Profile
-      ConnectorType:
-        default: Connection Profile Type
-      TagName:
-        default: Company name
-      TagEnvironment:
-        default: Environment tag
-      ConnectorProfileName:
-        default: Connection name for Redshift cluster
-      MaintenanceTrack:
-        default: Amazon Redshift version to apply during a maintenance window
-      EnableVPCEnhancedRouting:
-        default: Enhanced VPC routing in Amazon Redshift
-      EnableAQUA:
-        default: Advanced Query Accelerator
-      ConcurrencyScaling:
-        default: You can support virtually unlimited concurrent users and concurrent queries, with consistently fast query performance.
-      EncryptionAtRest:
-        default: Enables or disables encryption at rest of the Redshift database.
+          - RemoteAccessCIDR1
+          - RemoteAccessCIDR2
+          - RemoteAccessCIDR3         
+          - PublicSubnet1ID
+          - PublicSubnet2ID
+          - PrivateSubnet1AID
+          - PrivateSubnet2AID
+  ParameterLabels:
+    PrivateSubnet1AID:
+      default: Private subnet 1 CIDR
+    PrivateSubnet2AID:
+      default: Private subnet 2 CIDR
+    PublicSubnet1ID:
+      default: Public subnet 1 CIDR
+    PublicSubnet2ID:
+      default: Public subnet 1 CIDR
+    RemoteAccessCIDR1:
+      default: Allowed external access CIDR
+    RemoteAccessCIDR2:
+      default: Allowed external access CIDR
+    RemoteAccessCIDR3:
+      default: Allowed external access CIDR
+    VPCCIDR:
+      default: VPC CIDR
+    DatabaseName:
+      default: The name of the first database to be created when the cluster is created
+    RedshiftClusterPort:
+      default: Redshift database clusters are not using their default endpoint port
+    NumberOfNodes:
+      default: The number of compute nodes in the cluster
+    NodeType:
+      default: The node type determines the CPU, RAM, storage capacity, and storage drive type for each node
+    AutoPasswordRotationIntervalDays:
+      default: Password rotation refers to the changing/resetting of a password(s)
+    S3BucketPrefix:
+      default: S3 Bucket Prefix for logging bucket
+    EnableLoggingToS3:
+      default: Enables or disables logging to an S3 bucket.
+    MasterUsername:
+      default: Connection Profile name for RedShift
+    MaxConcurrentCluster:
+      default: The maximum number of concurrency scaling Redshift clusters
+    ConnectionModeVal:
+      default: Connection Mode for Connection Profile
+    ConnectorType:
+      default: Connection Profile Type
+    TagName:
+      default: Company name
+    TagEnvironment:
+      default: Environment tag
+    ConnectorProfileName:
+      default: Connection name for Redshift cluster
+    MaintenanceTrack:
+      default: Amazon Redshift version to apply during a maintenance window
+    EnableVPCEnhancedRouting:
+      default: Enhanced VPC routing in Amazon Redshift
+    EnableAQUA:
+      default: Advanced Query Accelerator
+    ConcurrencyScaling:
+      default: You can support virtually unlimited concurrent users and concurrent queries, with consistently fast query performance.
+    EncryptionAtRest:
+      default: Enables or disables encryption at rest of the Redshift database.
 Parameters:
+  PublicSubnet1ID:
+    Description: ID of the public subnet in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  PublicSubnet2ID:
+    Description: ID of the public subnet in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet1AID:
+    Description: ID of the private subnet in Availability Zone 1
+    Type: AWS::EC2::Subnet::Id
+  PrivateSubnet2AID:
+    Description: ID of the private subnet in Availability Zone 2
+    Type: AWS::EC2::Subnet::Id    
+  RemoteAccessCIDR1:
+    Description: Comma-delimited list of three CIDR IPs
+    Type: String
+  RemoteAccessCIDR2:
+    Description: Comma-delimited list of three CIDR IPs
+    Type: String
+  RemoteAccessCIDR3:
+    Description: Comma-delimited list of three CIDR IPs
+    Type: String
   VPCCIDR:
-    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    ConstraintDescription: Must be a valid IP range in the form x.x.x.x/x.
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28.
     Description: CIDR block for the VPC.
     Type: String
-  RemoteAccessCIDR:
-    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/([0-9]|[1-2][0-9]|3[0-2]))$
-    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
-    Description: Allowed CIDR block to access Redshift cluster.
-    Type: String
+  VPCID:
+    Description: 'ID of the VPC (for example, vpc-0343606e)'
+    Type: 'AWS::EC2::VPC::Id'
   DatabaseName:
     Description: The name of the first database to be created when the cluster is created.
     Type: String
@@ -100,7 +131,6 @@ Parameters:
   NumberOfNodes:
     Description: The number of compute nodes in the cluster. For multi-node clusters, the NumberOfNodes parameter must be greater than 1.
     Type: Number
-    Default: '2'
   NodeType:
     Description: The type of node to be provisioned, we recommend select RA3 nodes wherever available.
     Type: String
@@ -146,7 +176,6 @@ Parameters:
       - 'true'
       - 'false'
     ConstraintDescription: must be true or false.
-    Default: 'true'
   EnableLoggingToS3:
     Type: String
     AllowedValues:
@@ -170,8 +199,7 @@ Parameters:
     Description: Defines Amazon Redshift version to apply during a maintenance window. Select "current" to apply most recent version and "trailing" for the previous version.
   TagName:
     Type: String
-    Description: The unique friendly name as required by your company’s tagging strategy document, and which will be added to the environment tag.
-    Default: 'redshift'
+    Description: The unique friendly name as required by your company?s tagging strategy document, and which will be added to the environment tag.
   TagEnvironment:
     Type: String
     AllowedValues:
@@ -183,14 +211,12 @@ Parameters:
     Default: none
     Description: The environment tag that is used to designate the environment stage of the associated AWS resource.
   ConnectionModeVal:
-    Default: 'Public'
     Type: String
     AllowedValues:
       - 'Public'
       - 'Private'
     Description: Connection Mode for Connection Profile
   ConnectorProfileName:
-    Default: 'Hello'
     Type: String
     Description: Connection Profile Name
   ConnectorType:
@@ -200,15 +226,7 @@ Parameters:
       - 'Redshift'
       - 'Salesforce'
     Description: Connection Profile Type
-  Subnet1:
-    Description: The ID of the subnet in Availability Zone 1 in your existing VPC.
-    Type: 'AWS::EC2::Subnet::Id'
-  Subnet2:
-    Description: The ID of the subnet in Availability Zone 2 in your existing VPC.
-    Type: 'AWS::EC2::Subnet::Id'
-  VPCID:
-    Description: The ID of your existing VPC that you’re deploying Redshift into.
-    Type: 'AWS::EC2::VPC::Id'
+
 Mappings:
   Redshift: # static values related to the redshift cluster
     Password:
@@ -288,6 +306,10 @@ Resources:
     Properties:
       GroupDescription: Security group for lambda to communicate with Redshift
       VpcId: !Ref VPCID
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: '0.0.0.0/0'                                                                                                                                                                                                                                                                                                            
+
   LambdaRedShiftRunOnStart:
     Type: AWS::Lambda::Function
     DependsOn: RedshiftCluster
@@ -310,11 +332,11 @@ Resources:
       Runtime: python3.7
       VpcConfig:
         SecurityGroupIds:
-          - !Ref RedshiftSecurityGroup
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
         SubnetIds:
-          - !Ref Subnet1
-          - !Ref Subnet2
-      Timeout: 180
+          - !Ref PrivateSubnet1AID
+          - !Ref PrivateSubnet2AID      
       Code:
         ZipFile: !Sub |
           import json
@@ -655,7 +677,7 @@ Resources:
           - Effect: Allow
             Action:
             - logs:*
-            Resource: !Sub arn:${AWS::Partition}:logs:*:*:*
+            Resource: arn:aws:logs:*:*:*
           - Effect: Allow
             Action:
             - ec2:CreateNetworkInterface
@@ -673,7 +695,17 @@ Resources:
         - IpProtocol: tcp
           FromPort: !Ref RedshiftClusterPort
           ToPort: !Ref RedshiftClusterPort
-          CidrIp: !Ref RemoteAccessCIDR
+          CidrIp: !Ref RemoteAccessCIDR1
+          Description: 'Redshift Access to VPC CIDR'
+        - IpProtocol: tcp
+          FromPort: !Ref RedshiftClusterPort
+          ToPort: !Ref RedshiftClusterPort
+          CidrIp: !Ref RemoteAccessCIDR2
+          Description: 'Redshift Access to VPC CIDR'
+        - IpProtocol: tcp
+          FromPort: !Ref RedshiftClusterPort
+          ToPort: !Ref RedshiftClusterPort
+          CidrIp: !Ref RemoteAccessCIDR3
           Description: 'Redshift Access to VPC CIDR'
         - IpProtocol: tcp
           FromPort: !Ref RedshiftClusterPort
@@ -740,12 +772,6 @@ Resources:
               StringEquals:
                 'kms:CallerAccount': !Sub '${AWS::AccountId}'
                 'kms:ViaService': !Sub 'redshift.${AWS::Region}.amazonaws.com'
-  # KMSAlias:
-  #   Type: AWS::KMS::Alias
-  #   Properties:
-  #     AliasName: alias/appflow-key
-  #     TargetKeyId: !Ref CMKeyRedshiftCluster
-
   RedshiftLoggingS3Bucket:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Retain
@@ -891,8 +917,8 @@ Resources:
     Properties:
       Description: Cluster subnet group
       SubnetIds:
-        - !Ref Subnet1
-        - !Ref Subnet2
+        - !Ref PublicSubnet1ID
+        - !Ref PublicSubnet2ID
       Tags:
         - Key: Name
           Value:
@@ -1154,4 +1180,3 @@ Outputs:
     Description: S3 bucket log prefix
     Export:
       Name: "S3BucketPrefix"
-

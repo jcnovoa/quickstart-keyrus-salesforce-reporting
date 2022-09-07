@@ -8,7 +8,6 @@ Metadata:
     Order: 7
   AWS::CloudFormation::Interface:
     ParameterGroups:
-
       - Label:
           default: Amazon AppFlow configuration
         Parameters:
@@ -487,10 +486,9 @@ Resources:
               Value: character varying
             - Key: SOURCE_DATA_TYPE
               Value: textarea
-
+              
       # TriggerConfig:
       #   TriggerType: OnDemand
-
       TriggerConfig:
         TriggerType: Scheduled
         TriggerProperties:
@@ -519,7 +517,6 @@ Resources:
         - !Sub arn:${AWS::Partition}:iam::aws:policy/SecretsManagerReadWrite
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonAppFlowFullAccess
         - !Sub arn:${AWS::Partition}:iam::aws:policy/AmazonS3FullAccess
-
   ActivateAppFlowOnStart:
     Type: AWS::Lambda::Function
     DependsOn: LambdaExecutionRole
