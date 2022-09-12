@@ -16,10 +16,10 @@ Metadata:
     ParameterLabels:
       ContactSalesforce:
         default: "Name of the Contact object flow"
-      ConnectorProfileNameSalesforce: 
+      ConnectorProfileNameSalesforce:
         default: Production radio box from the Salesforce environment section (connection Must be created before deploying )
 Parameters:
-  ContactSalesforce: 
+  ContactSalesforce:
     Description: Salesforce Contact Objects
     Type: String
   ConnectorProfileNameSalesforce:
@@ -28,6 +28,13 @@ Parameters:
 Resources:
   SalesforceFlow:
     Type: AWS::AppFlow::Flow
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E9101
+          ignore_reasons:
+            E9101: This is by design due to Salesforce terminology.
     Properties:
       Description: AppFlow Flow integrating Saleforce with a Redshift
       DestinationFlowConfigList:
@@ -881,4 +888,3 @@ Resources:
 
 
 
-  

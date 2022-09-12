@@ -31,7 +31,7 @@ Metadata:
           - VPCCIDR
           - RemoteAccessCIDR1
           - RemoteAccessCIDR2
-          - RemoteAccessCIDR3         
+          - RemoteAccessCIDR3
           - PublicSubnet1ID
           - PublicSubnet2ID
           - PrivateSubnet1AID
@@ -103,7 +103,7 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   PrivateSubnet2AID:
     Description: ID of the private subnet in Availability Zone 2
-    Type: AWS::EC2::Subnet::Id    
+    Type: AWS::EC2::Subnet::Id
   RemoteAccessCIDR1:
     Description: Comma-delimited list of three CIDR IPs
     Type: String
@@ -308,7 +308,7 @@ Resources:
       VpcId: !Ref VPCID
       SecurityGroupEgress:
         - IpProtocol: '-1'
-          CidrIp: '0.0.0.0/0'                                                                                                                                                                                                                                                                                                            
+          CidrIp: '0.0.0.0/0'
 
   LambdaRedShiftRunOnStart:
     Type: AWS::Lambda::Function
@@ -332,11 +332,10 @@ Resources:
       Runtime: python3.7
       VpcConfig:
         SecurityGroupIds:
-        SecurityGroupIds:
           - !Ref LambdaSecurityGroup
         SubnetIds:
           - !Ref PrivateSubnet1AID
-          - !Ref PrivateSubnet2AID      
+          - !Ref PrivateSubnet2AID
       Code:
         ZipFile: !Sub |
           import json
@@ -677,7 +676,7 @@ Resources:
           - Effect: Allow
             Action:
             - logs:*
-            Resource: arn:aws:logs:*:*:*
+            Resource: !Sub arn:${AWS::Partition}:logs:*:*:*
           - Effect: Allow
             Action:
             - ec2:CreateNetworkInterface

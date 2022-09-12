@@ -80,9 +80,9 @@ Metadata:
       RemoteAccessCIDR1:
         default: Comma-delimited list of three CIDR IPs in us-east-1
       RemoteAccessCIDR2:
-        default: Comma-delimited list of three CIDR IPs in us-east-1  
+        default: Comma-delimited list of three CIDR IPs in us-east-1
       RemoteAccessCIDR3:
-        default: Comma-delimited list of three CIDR IPs in us-east-1      
+        default: Comma-delimited list of three CIDR IPs in us-east-1
       DatabaseName:
         default: The name of the first database to be created when the cluster is created
       RedshiftClusterPort:
@@ -158,10 +158,6 @@ Parameters:
     Description: Region where the Quick Start S3 bucket (QSS3BucketName) is
       hosted. When using your own bucket, you must specify this value.
     Type: String
-  ChildStackPath:
-    Description: "Path to child stack cfts"
-    Type: String
-    Default: "https://my-bucket-s3-name-s3-appflow.s3.amazonaws.com"
   AvailabilityZones:
     Description: 'Select 2 Availability Zones to use for the subnets in the VPC.'
     Type: List<AWS::EC2::AvailabilityZone::Name>
@@ -237,13 +233,13 @@ Parameters:
       - ds2.xlarge
       - ds2.8xlarge
   AutoPasswordRotationIntervalDays:
-    Description: Number of days after which master user password will be auto-rotated
+    Description: Number of days after which user password will be auto-rotated
     Type: String
     Default: 30
     AllowedPattern: '([0-9])*'
     ConstraintDescription: must be a number
   MasterUsername:
-    Description: The user name that is associated with the master user account for the cluster that is being created.
+    Description: The user name that is associated with the user account for the cluster that is being created.
     Type: String
     Default: test
     AllowedPattern: '([a-z])([a-z]|[0-9])*'
@@ -364,7 +360,7 @@ Resources:
   VPCStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
-      TemplateURL !Sub
+      TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml'
         - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
           S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
@@ -381,6 +377,13 @@ Resources:
   SalesforceRedshift:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
+    Metadata:
+      cfn-lint:
+        config:
+          ignore_checks:
+            - E9101
+          ignore_reasons:
+            E9101: This is based on what RedShift service uses.
     Properties:
       TemplateURL: !Sub
         - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/quickstart-salesforce-redshift.template.yaml'
@@ -405,7 +408,7 @@ Resources:
         PrivateSubnet2AID:
           Fn::GetAtt:
           - VPCStack
-          - Outputs.PrivateSubnet2AID          
+          - Outputs.PrivateSubnet2AID
         VPCID:
           Fn::GetAtt:
           - VPCStack
