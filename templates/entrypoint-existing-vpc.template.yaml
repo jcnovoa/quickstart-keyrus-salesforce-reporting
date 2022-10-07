@@ -46,7 +46,7 @@ Metadata:
           - NodeType
           - EncryptionAtRest
           - AutoPasswordRotationIntervalDays
-          - MasterUsername
+          - RedShiftUsername
           - ConcurrencyScaling
           - MaxConcurrentCluster
           - EnableAQUA
@@ -91,8 +91,8 @@ Metadata:
         default: S3 bucket prefix
       EnableLoggingToS3:
         default: Enable logging to S3
-      MasterUsername:
-        default: Master user name
+      RedShiftUsername:
+        default: Primary user name
     # TODO: Troy, We can’t use "master" in AWS parameters.
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
@@ -183,15 +183,15 @@ Parameters:
     Description: ID of the private subnet in Availability Zone 2 of your existing VPC (e.g., subnet-be8b01ea).
     Default: ""
   RemoteAccessCIDR1:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: This is the IP Address used to remotely access the environment.
     Type: String
     Default: 3.235.189.100/30
   RemoteAccessCIDR2:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: External IP allowed to access the Redshift Cluster.
     Type: String
     Default: 3.235.189.96/30
   RemoteAccessCIDR3:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: Secondary external IP allowed to access the Redshift Cluster.
     Type: String
     Default: 44.194.111.224/30
   DatabaseName:
@@ -226,7 +226,7 @@ Parameters:
     Default: 30
     AllowedPattern: '([0-9])*'
     ConstraintDescription: Must be a number.
-  MasterUsername:
+  RedShiftUsername:
     Description: The user name that is associated with the user account for the cluster that is being created.
     Type: String
     Default: test
@@ -373,7 +373,7 @@ Resources:
         NumberOfNodes: !Ref NumberOfNodes
         NodeType: !Ref NodeType
         AutoPasswordRotationIntervalDays: !Ref AutoPasswordRotationIntervalDays
-        MasterUsername: !Ref MasterUsername
+        RedShiftUsername: !Ref RedShiftUsername
         ConcurrencyScaling: !Ref ConcurrencyScaling
         MaxConcurrentCluster: !Ref MaxConcurrentCluster
         EnableAQUA: !Ref EnableAQUA
