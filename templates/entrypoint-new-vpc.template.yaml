@@ -69,11 +69,9 @@ Metadata:
       VPCCIDR:
         default: VPC CIDR
       PrivateSubnet1CIDR:
-        default: Private subnet 1A CIDR
-    # TODO Troy, Can we delete this "A"? Neither the description nor the parameter itself include an "A." If we need the "A," clarify in the description what it refers to.
+        default: Private subnet 1 CIDR
       PrivateSubnet2CIDR:
-        default: Private subnet 2A CIDR
-    # TODO Troy, Can we delete this "A"? Neither the description nor the parameter itself include an "A." If we need the "A," clarify in the description what it refers to.
+        default: Private subnet 2 CIDR
       PublicSubnet1CIDR:
         default: Public subnet 1 CIDR
       PublicSubnet2CIDR:
@@ -98,9 +96,8 @@ Metadata:
         default: S3 bucket prefix
       EnableLoggingToS3:
         default: Enable logging to S3
-      MasterUsername:
-        default: Master user name
-    # TODO: Troy, We can’t use "master" in AWS parameters.
+      RedShiftUsername:
+        default: Primary user name
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
       ConnectionModeVal:
@@ -209,19 +206,15 @@ Parameters:
     Description: 'CIDR block for the public subnet 2, located in Availability Zone 2.'
     Type: String
   RemoteAccessCIDR1:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Is this parameter actually a "list of three" addresses?
-    # TODO Troy, What's unique about RemoteAccessCIDR1 (vs. CIDR2 & CIDR3)?
+    Description: This is the IP Address used to remotely access the environment.
     Type: String
     Default: 3.235.189.100/30
   RemoteAccessCIDR2:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Same questions as RemoteAccessCIDR1.
+    Description: External IP allowed to access the Redshift Cluster.
     Type: String
     Default: 3.235.189.96/30
   RemoteAccessCIDR3:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Same questions as RemoteAccessCIDR1.
+    Description: Secondary external IP allowed to access the Redshift Cluster.
     Type: String
     Default: 44.194.111.224/30
   DatabaseName:
@@ -230,8 +223,7 @@ Parameters:
     Default: dev
     AllowedPattern: '([a-z]|[0-9])+'
   RedshiftClusterPort:
-    Description: Port on which the Redshift database cluster accepts incoming connections.
-    # TODO: Troy, I removed this statement: “Redshift database clusters are not using their default endpoint port.” If that statement implied an action that people need to take or avoid taking when they deploy, please spell it out.
+    Description: Port on which the Redshift database cluster accepts incoming connections. Currently defaulted to a non-standard RedShift Endpoint Port.
     Type: Number
     Default: '5439'
   NumberOfNodes:
@@ -256,7 +248,7 @@ Parameters:
     Default: 30
     AllowedPattern: '([0-9])*'
     ConstraintDescription: Must be a number.
-  MasterUsername:
+  RedShiftUsername:
     Description: User name that is associated with the user account for the cluster that is being created.
     Type: String
     Default: test
@@ -441,7 +433,7 @@ Resources:
         NumberOfNodes: !Ref NumberOfNodes
         NodeType: !Ref NodeType
         AutoPasswordRotationIntervalDays: !Ref AutoPasswordRotationIntervalDays
-        MasterUsername: !Ref MasterUsername
+        RedShiftUsername: !Ref RedShiftUsername
         ConcurrencyScaling: !Ref ConcurrencyScaling
         MaxConcurrentCluster: !Ref MaxConcurrentCluster
         EnableAQUA: !Ref EnableAQUA
