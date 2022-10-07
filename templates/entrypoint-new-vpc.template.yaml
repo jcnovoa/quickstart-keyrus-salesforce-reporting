@@ -49,7 +49,7 @@ Metadata:
           - NodeType
           - EncryptionAtRest
           - AutoPasswordRotationIntervalDays
-          - MasterUsername
+          - RedShiftUsername
           - ConcurrencyScaling
           - MaxConcurrentCluster
           - EnableAQUA
