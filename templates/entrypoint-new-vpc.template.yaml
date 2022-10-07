@@ -235,7 +235,7 @@ Parameters:
     Type: Number
     Default: '5439'
   NumberOfNodes:
-    Description: Number of compute nodes in the cluster. For multi-node clusters, the NumberOfNodes parameter must be greater than 1.
+    Description: Number of compute nodes in the cluster. For multi-node clusters, this number must be greater than 1.
     Type: Number
     Default: '2'
   NodeType:
@@ -280,7 +280,7 @@ Parameters:
       - 'auto'
       - 'enabled'
       - 'disabled'
-    Description: Enables or disables AQUA (Advanced Query Accelerator) for Amazon Redshift. If you don't want the use of AQUA to be determined automatically, choose "enabled" or "disabled."
+    Description: Enables or disables AQUA (Advanced Query Accelerator). If you don't want Amazon Redshift to automatically determine whether to use AQUA, choose "enabled" or "disabled."
   EncryptionAtRest:
     Description: Enables or disables encryption at rest for the Redshift database. To disable encryption at rest, choose "false."
     Type: String
