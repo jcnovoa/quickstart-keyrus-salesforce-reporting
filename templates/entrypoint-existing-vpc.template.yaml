@@ -92,7 +92,7 @@ Metadata:
       EnableLoggingToS3:
         default: Enable logging to S3
       MasterUsername:
-        default: Master user name
+        default: Main user name
     # TODO: Troy, We can’t use "master" in AWS parameters.
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
@@ -183,15 +183,15 @@ Parameters:
     Description: ID of the private subnet in Availability Zone 2 of your existing VPC (e.g., subnet-be8b01ea).
     Default: ""
   RemoteAccessCIDR1:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
     Type: String
     Default: 3.235.189.100/30
   RemoteAccessCIDR2:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
     Type: String
     Default: 3.235.189.96/30
   RemoteAccessCIDR3:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
     Type: String
     Default: 44.194.111.224/30
   DatabaseName:
@@ -200,8 +200,7 @@ Parameters:
     Default: dev
     AllowedPattern: '([a-z]|[0-9])+'
   RedshiftClusterPort:
-    Description: Port on which the cluster accepts incoming connections.
-    # TODO: Troy, I removed this statement: “Redshift database clusters are not using their default endpoint port.” If that statement implied an action that people need to take or avoid taking when they deploy, please spell it out.
+    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) is different from the standard Amazon Redshift default. Don't change this port unless required by your corporate security team.
     Type: Number
     Default: '5439'
   NumberOfNodes:
