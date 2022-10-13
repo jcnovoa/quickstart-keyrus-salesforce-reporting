@@ -69,11 +69,9 @@ Metadata:
       VPCCIDR:
         default: VPC CIDR
       PrivateSubnet1CIDR:
-        default: Private subnet 1A CIDR
-    # TODO Troy, Can we delete this "A"? Neither the description nor the parameter itself include an "A." If we need the "A," clarify in the description what it refers to.
-      PrivateSubnet2CIDR:
-        default: Private subnet 2A CIDR
-    # TODO Troy, Can we delete this "A"? Neither the description nor the parameter itself include an "A." If we need the "A," clarify in the description what it refers to.
+        default: Private subnet 1 CIDR
+        PrivateSubnet2CIDR:
+        default: Private subnet 2 CIDR
       PublicSubnet1CIDR:
         default: Public subnet 1 CIDR
       PublicSubnet2CIDR:
@@ -99,8 +97,7 @@ Metadata:
       EnableLoggingToS3:
         default: Enable logging to S3
       MasterUsername:
-        default: Master user name
-    # TODO: Troy, We can’t use "master" in AWS parameters.
+        default: Main user name
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
       ConnectionModeVal:
@@ -209,19 +206,15 @@ Parameters:
     Description: 'CIDR block for the public subnet 2, located in Availability Zone 2.'
     Type: String
   RemoteAccessCIDR1:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Is this parameter actually a "list of three" addresses?
-    # TODO Troy, What's unique about RemoteAccessCIDR1 (vs. CIDR2 & CIDR3)?
+    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
     Type: String
     Default: 3.235.189.100/30
   RemoteAccessCIDR2:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Same questions as RemoteAccessCIDR1.
+    Description: CIDR IP address 2 for remotely accessing the Redshift cluster.
     Type: String
     Default: 3.235.189.96/30
   RemoteAccessCIDR3:
-    Description: Comma-delimited list of three CIDR IP addresses.
-    # TODO Troy, Same questions as RemoteAccessCIDR1.
+    Description: CIDR IP address 3 for remotely accessing the Redshift cluster.
     Type: String
     Default: 44.194.111.224/30
   DatabaseName:
@@ -230,8 +223,7 @@ Parameters:
     Default: dev
     AllowedPattern: '([a-z]|[0-9])+'
   RedshiftClusterPort:
-    Description: Port on which the Redshift database cluster accepts incoming connections.
-    # TODO: Troy, I removed this statement: “Redshift database clusters are not using their default endpoint port.” If that statement implied an action that people need to take or avoid taking when they deploy, please spell it out.
+    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) is different from the standard Amazon Redshift default. Don't change this port unless required by your corporate security team.
     Type: Number
     Default: '5439'
   NumberOfNodes:
