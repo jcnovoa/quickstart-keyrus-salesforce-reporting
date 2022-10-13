@@ -93,7 +93,6 @@ Metadata:
         default: Enable logging to S3
       MasterUsername:
         default: Main user name
-    # TODO: Troy, We can’t use "master" in AWS parameters.
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
       ConnectionModeVal:
