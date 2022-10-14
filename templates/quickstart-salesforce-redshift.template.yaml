@@ -26,7 +26,7 @@ Metadata:
           - NodeType
           - EncryptionAtRest
           - AutoPasswordRotationIntervalDays
-          - MasterUsername
+          - RedShiftUsername
           - ConcurrencyScaling
           - MaxConcurrentCluster
           - EnableAQUA
@@ -73,7 +73,7 @@ Metadata:
       default: S3 Bucket Prefix for logging bucket
     EnableLoggingToS3:
       default: Enables or disables logging to an S3 bucket.
-    MasterUsername:
+    RedShiftUsername:
       default: Connection Profile name for RedShift
     MaxConcurrentCluster:
       default: The maximum number of concurrency scaling Redshift clusters
@@ -111,13 +111,13 @@ Parameters:
     Description: ID of the private subnet in Availability Zone 2
     Type: AWS::EC2::Subnet::Id
   RemoteAccessCIDR1:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: This is the IP Address used to remotely access the environment
     Type: String
   RemoteAccessCIDR2:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: External IP allowed to access the Redshift Cluster.
     Type: String
   RemoteAccessCIDR3:
-    Description: Comma-delimited list of three CIDR IPs
+    Description: Secondary external IP allowed to access the Redshift Cluster.
     Type: String
   VPCCIDR:
     AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
@@ -153,7 +153,7 @@ Parameters:
     Type: String
     AllowedPattern: '([0-9])*'
     ConstraintDescription: must be a number
-  MasterUsername:
+  RedShiftUsername:
     Description: The user name that is associated with the user account for the cluster that is being created.
     Type: String
     AllowedPattern: '([a-z])([a-z]|[0-9])*'
@@ -951,7 +951,7 @@ Resources:
       GenerateSecretString:
         SecretStringTemplate: !Sub
         - '{"username": "${MasterUsername}"}'
-        - {MasterUsername: !Ref MasterUsername}
+        - {MasterUsername: !Ref RedShiftUsername}
         GenerateStringKey: password
         PasswordLength: !FindInMap [ Redshift, Password, Length]
         ExcludePunctuation: true
@@ -1143,7 +1143,7 @@ Outputs:
     Export:
       Name: !Sub '${AWS::StackName}-RedshiftDatabaseName'
   RedshiftUsername:
-    Value: !Ref MasterUsername
+    Value: !Ref RedShiftUsername
     Export:
       Name: !Sub '${AWS::StackName}-RedshiftUsername'
   SecretRedshiftMasterUserSecret:
@@ -1174,7 +1174,7 @@ Outputs:
         - ' -p '
         - !GetAtt 'RedshiftCluster.Endpoint.Port'
         - ' -U '
-        - !Ref MasterUsername
+        - !Ref RedShiftUsername
         - ' -d '
         - !Ref DatabaseName
   RedshiftClusterJDBCUrl:

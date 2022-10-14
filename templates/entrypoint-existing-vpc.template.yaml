@@ -46,7 +46,7 @@ Metadata:
           - NodeType
           - EncryptionAtRest
           - AutoPasswordRotationIntervalDays
-          - MasterUsername
+          - RedShiftUsername
           - ConcurrencyScaling
           - MaxConcurrentCluster
           - EnableAQUA
@@ -91,8 +91,8 @@ Metadata:
         default: S3 bucket prefix
       EnableLoggingToS3:
         default: Enable logging to S3
-      MasterUsername:
-        default: Main user name
+      RedShiftUsername:
+        default: Amazon Redshift user name
       MaxConcurrentCluster:
         default: Maximum concurrent clusters
       ConnectionModeVal:
@@ -182,15 +182,15 @@ Parameters:
     Description: ID of the private subnet in Availability Zone 2 of your existing VPC (e.g., subnet-be8b01ea).
     Default: ""
   RemoteAccessCIDR1:
-    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
+    Description: IP address that remotely accesses the environment.
     Type: String
     Default: 3.235.189.100/30
   RemoteAccessCIDR2:
-    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
+    Description: External IP address that accesses the Amazon Redshift cluster.
     Type: String
     Default: 3.235.189.96/30
   RemoteAccessCIDR3:
-    Description: CIDR IP address 1 for remotely accessing the Redshift cluster.
+    Description: Secondary external IP address that accesses the Amazon Redshift cluster.
     Type: String
     Default: 44.194.111.224/30
   DatabaseName:
@@ -199,7 +199,7 @@ Parameters:
     Default: dev
     AllowedPattern: '([a-z]|[0-9])+'
   RedshiftClusterPort:
-    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) differs from the standard Amazon Redshift default. Don't change this port unless required by your corporate security team.
+    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) differs from the standard Amazon Redshift endpoint port. Don't change this port unless required by your corporate security team.
     Type: Number
     Default: '5439'
   NumberOfNodes:
@@ -224,7 +224,7 @@ Parameters:
     Default: 30
     AllowedPattern: '([0-9])*'
     ConstraintDescription: Must be a number.
-  MasterUsername:
+  RedShiftUsername:
     Description: The user name that is associated with the user account for the cluster that is being created.
     Type: String
     Default: test
@@ -370,7 +370,7 @@ Resources:
         NumberOfNodes: !Ref NumberOfNodes
         NodeType: !Ref NodeType
         AutoPasswordRotationIntervalDays: !Ref AutoPasswordRotationIntervalDays
-        MasterUsername: !Ref MasterUsername
+        RedShiftUsername: !Ref RedShiftUsername
         ConcurrencyScaling: !Ref ConcurrencyScaling
         MaxConcurrentCluster: !Ref MaxConcurrentCluster
         EnableAQUA: !Ref EnableAQUA
