@@ -223,7 +223,7 @@ Parameters:
     Default: dev
     AllowedPattern: '([a-z]|[0-9])+'
   RedshiftClusterPort:
-    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) is different from the standard Amazon Redshift default. Don't change this port unless required by your corporate security team.
+    Description: Port on which the Redshift database cluster accepts incoming connections. This default port (5439) differs from the standard Amazon Redshift default. Don't change this port unless required by your corporate security team.
     Type: Number
     Default: '5439'
   NumberOfNodes:
@@ -359,10 +359,8 @@ Parameters:
     Default: Opportunity-Salesforce
     Type: String
   ConnectorProfileNameSalesforce:
-    Description: "Name that you created in the Amazon AppFlow console when you connected your VPC with your Salesforce account. Enter the connection name exactly as you created it."
-    # TODO Troy, If the VPC must already be connected, how can we say that this template launches into a new VPC (one that doesn't exist yet)?
+    Description: Connection name that you created when you connected Amazon AppFlow with your Salesforce account.
     Type: String
-    Default: aws_demo
 Conditions:
   UsingDefaultBucket: !Equals
     - !Ref QSS3BucketName
