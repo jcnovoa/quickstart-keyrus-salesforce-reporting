@@ -33,6 +33,5 @@ tests:
       QSS3BucketName: $[taskcat_autobucket]
       QSS3KeyPrefix: quickstart-keyrus-salesforce-reporting/
       QSS3BucketRegion: $[taskcat_current_region]
-
     regions:
       - us-east-1
