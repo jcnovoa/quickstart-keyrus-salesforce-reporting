@@ -335,7 +335,7 @@ Resources:
           host: !Sub ${RedshiftCluster.Endpoint.Address}
       Handler: index.handler
       Role: !GetAtt LambdaExecutionRole.Arn
-      Runtime: python3.7
+      Runtime: python3.8
       VpcConfig:
         SecurityGroupIds:
           - !Ref LambdaSecurityGroup
